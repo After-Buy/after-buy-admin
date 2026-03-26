@@ -1,19 +1,31 @@
 import './App.css'
 import { Routes, Route} from 'react-router-dom';
 import Layout from './components/Layout.tsx';
+import Dashboard from './routes/Dashboard.tsx';
+import Notice from './routes/Notice.tsx';
+import Error from './routes/Error.tsx';
+import Guide from './routes/Guide.tsx';
+import Log from './routes/Log.tsx';
+import Ocr from './routes/Ocr.tsx';
+import Login from './routes/Login.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<h2>대시보드</h2>} />
-        <Route path="notice" element={<h2>공지사항</h2>} />
-        <Route path="error" element={<h2>에러 로그</h2>} />
-        <Route path="guide" element={<h2>이용 안내</h2>} />
-        <Route path="log" element={<h2>로그인 내역</h2>} />
-        <Route path="ocr" element={<h2>OCR 오인식</h2>} />
+      <Route path="/login" element={<Login />} />
+      <Route element={<ProtectedRoute />} >
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="notice" element={<Notice />} />
+          <Route path="error" element={<Error />} />
+          <Route path="guide" element={<Guide />} />
+          <Route path="log" element={<Log />} />
+          <Route path="ocr" element={<Ocr />} />
+        </Route>
       </Route>
+      <Route path="*" element={<Login />} />
     </Routes>
   )
 }
