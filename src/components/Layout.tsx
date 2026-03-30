@@ -1,15 +1,22 @@
 import {LayoutDashboard, Megaphone, FileText, MessageSquare, ClipboardList, ScanLine, CircleUserRound, LogOut} from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import axios from 'axios';
+
 function Layout() {
     
     const location = useLocation();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        // 로그아웃 처리 로직 추가 예정
-        localStorage.removeItem('isLoggedIn'); 
-        navigate("/login", { replace: true });
+    const handleLogout = async () => {
+        try {
+            await axios.post('/api/admin/auth/logout', {}, { withCredentials: true });
+        } catch (error) {
+            console.error('로그아웃 중 오류 발생:', error);
+        } finally {
+            localStorage.removeItem('isLoggedIn'); 
+            navigate("/login", { replace: true });
+        }
     }
 
     return (
