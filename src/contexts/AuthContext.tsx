@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import axios from 'axios';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,14 +18,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/admin/auth/check');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-          }
+        const response = await axios.get('/api/admin/auth/check', {
+          withCredentials: true,
+        });
+
+        if (response.data.success) {
+          setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
         }

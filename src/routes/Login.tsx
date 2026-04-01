@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/icon.png';
+import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
@@ -11,7 +12,7 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!adminAccount || !password) {
       setErrorMsg('아이디와 비밀번호를 모두 입력해 주세요.');
@@ -22,29 +23,30 @@ function Login() {
     setErrorMsg('');
 
     try {
-      const response = await fetch('/api/admin/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          admin_account: adminAccount,
-          password: password,
-        }),
+      const response = await axios.post('/api/admin/auth/login', {
+        admin_account: adminAccount,
+        password: password,
+      }, {
+        withCredentials: true
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        login(); // Context 상태 변경
+ 
+      if (response.data.success) {
+        login();
         navigate('/');
       } else {
-        // API 명세의 에러 메시지(message 필드) 표시
-        setErrorMsg(data.message || '로그인에 실패했습니다.');
+        setErrorMsg(response.data.message || '로그인에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('Login Error:', error);
-      setErrorMsg('서버와 연결을 실패했습니다.');
+    } catch (error: unknown) {
+      console.error('Login error:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data && error.response.data.message) {
+          setErrorMsg('로그인 실패: ' + error.response.data.message);
+        } else {
+          setErrorMsg('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        setErrorMsg('알 수 없는 오류가 발생했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -59,36 +61,34 @@ function Login() {
           <h2 className="subtitle">관리자</h2>
         </div>
       </div>
-      
-      <form onSubmit={handleLogin} className="login-form">
-        {errorMsg && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{errorMsg}</div>}
-        
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            placeholder="아이디"
+      <form onSubmit={handleLogin} className='login-form'>
+        <div>
+          <label htmlFor="username">아이디</label>
+          <input 
+            type="text" 
+            id="username" 
+            placeholder="아이디를 입력하세요" 
             value={adminAccount}
+            disabled={isLoading}
             onChange={(e) => setAdminAccount(e.target.value)}
-            disabled={isLoading}
-            style={{ width: '100%', padding: '8px' }}
           />
         </div>
-        
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            type="password"
-            placeholder="비밀번호"
+        <div>
+          <label htmlFor="password">비밀번호</label>
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="비밀번호를 입력하세요" 
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
-            style={{ width: '100%', padding: '8px' }}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        
-        <button type="submit" disabled={isLoading} style={{ width: '100%', padding: '10px' }}>
+        <button type="submit" disabled={isLoading}>
           {isLoading ? '로그인 중...' : '로그인'}
         </button>
       </form>
+      {errorMsg && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{errorMsg}</div>}
     </div>
   );
 }

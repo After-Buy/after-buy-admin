@@ -1,6 +1,7 @@
 import {LayoutDashboard, Megaphone, FileText, MessageSquare, ClipboardList, ScanLine, CircleUserRound, LogOut} from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
 function Layout() {
@@ -9,14 +10,14 @@ function Layout() {
     const { logout } = useAuth(); // 전역 로그아웃 함수
 
     const handleLogout = async () => {
-        try {
+        try { 
             // 서버에 세션 쿠키 삭제 요청
-            await fetch('/api/admin/auth/logout', { method: 'POST' });
+            await axios.post('/api/admin/auth/logout', {}, { withCredentials: true });
         } catch (error) {
-            console.error('Logout error:', error);
+            console.error('로그아웃 중 오류 발생:', error);
         } finally {
             // 통신 성공 여부와 상관없이 내 브라우저는 로그아웃 처리
-            logout();
+            logout(); 
             navigate("/login", { replace: true });
         }
     }
