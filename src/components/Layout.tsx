@@ -1,15 +1,24 @@
 import {LayoutDashboard, Megaphone, FileText, MessageSquare, ClipboardList, ScanLine, CircleUserRound, LogOut} from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { useAuth } from '../contexts/AuthContext';
+
 function Layout() {
-    
     const location = useLocation();
     const navigate = useNavigate();
+    const { logout } = useAuth(); // 전역 로그아웃 함수
 
-    const handleLogout = () => {
-        // 로그아웃 처리 로직 추가 예정
-        localStorage.removeItem('isLoggedIn'); 
-        navigate("/login", { replace: true });
+    const handleLogout = async () => {
+        try {
+            // 서버에 세션 쿠키 삭제 요청
+            await fetch('/api/admin/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            // 통신 성공 여부와 상관없이 내 브라우저는 로그아웃 처리
+            logout();
+            navigate("/login", { replace: true });
+        }
     }
 
     return (

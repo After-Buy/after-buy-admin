@@ -1,10 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function ProtectedRoute() {
-    // 로그인 인증 로직 추가 예정
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const { isAuthenticated, isLoading } = useAuth();
 
-    return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
+    // API 통신 결과가 아직 안 나왔으면 (새로고침 직후 등) 빈 화면 혹은 로딩스피너
+    if (isLoading) {
+        return <div style={{display:'flex', height:'100vh', alignItems:'center', justifyContent:'center'}}>인증 상태를 확인 중입니다...</div>;
+    }
+
+    // 결과에 따라 분기
+    return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 export default ProtectedRoute;
