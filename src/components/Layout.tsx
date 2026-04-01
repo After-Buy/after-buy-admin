@@ -2,19 +2,22 @@ import {LayoutDashboard, Megaphone, FileText, MessageSquare, ClipboardList, Scan
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 function Layout() {
-    
     const location = useLocation();
     const navigate = useNavigate();
+    const { logout } = useAuth(); // 전역 로그아웃 함수
 
     const handleLogout = async () => {
-        try {
+        try { 
+            // 서버에 세션 쿠키 삭제 요청
             await axios.post('/api/admin/auth/logout', {}, { withCredentials: true });
         } catch (error) {
             console.error('로그아웃 중 오류 발생:', error);
         } finally {
-            localStorage.removeItem('isLoggedIn'); 
+            // 통신 성공 여부와 상관없이 내 브라우저는 로그아웃 처리
+            logout(); 
             navigate("/login", { replace: true });
         }
     }
