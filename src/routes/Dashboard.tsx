@@ -1,23 +1,81 @@
 import { useEffect, useState } from "react"
 import axios from "axios";
+import { Link } from "react-router-dom";
+
+type UserStats = {
+    total_users: number;
+    new_users_7d: number;
+    new_users_7d_change_rate: number;
+    change_direction: string;
+};
+
+type OcrStats = {
+    total_attempts: number;
+    success_count: number;
+    modified_count: number;
+    failure_count: number;
+    success_rate: number;
+};
+
+type Announcement = {
+    announcement_id: number;
+    title: string;
+    category: string;
+    created_at: string;
+    is_pinned?: number;
+};
+
+type ErrorLog = {
+    log_id: number;
+    error_type: string;
+    error_message: string;
+    created_at: string;
+};
 
 function Dashboard() {
-    const [users, setUsers] = useState(1234);
-    const [newUsers, setNewUsers] = useState(56);
-    const [errorLogs, setErrorLogs] = useState(0);
+    const [userStats, setUserStats] = useState<UserStats | null>(null);
+    const [ocrStats, setOcrStats] = useState<OcrStats | null>(null);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([
+        {
+        announcement_id: 1,
+        title: "새로운 기능 업데이트",
+        category: "UPDATE",
+        is_pinned: 0,
+        created_at: "2026-03-25"
+    },
+    ]);
+    const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
+    const [errorCount, setErrorCount] = useState(0);
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    const categoryLabels: Record<string, string> = {
+        NOTICE: "안내",
+        MAINTENANCE: "점검",
+        UPDATE: "업데이트"
+    };
 
     useEffect(() => {
-        // axios.get('/api/dashboard')
-        //     .then(response => {
-        //         setUsers(response.data.users);
-        //         setNewUsers(response.data.newUsers);
-        //         setErrorLogs(response.data.errorLogs);
-        //     })
-        //     .catch(error => {
-        //         console.error('대시보드 데이터 로드 오류:', error);
-        //     });
-    }   , []);
+        axios.get('/api/admin/dashboard', { withCredentials: true })
+            .then(response => {
+                if (response.data.success) {
+                    const data = response.data.data;
+                    setUserStats(data.user_stats);
+                    setOcrStats(data.ocr_stats);
+                    setAnnouncements(data.recent_announcements);
+                    setErrorLogs(data.unresolved_error_logs);
+                    setErrorCount(data.unresolved_error_count);
+                }
+            })
+            .catch(error => {
+                console.error('대시보드 데이터 로드 오류:', error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, []);
 
+    if (isLoading) return <div>로딩 중...</div>;
 
     return (
         <>
@@ -26,56 +84,83 @@ function Dashboard() {
                 <div className="row">
                     <div className="card stats">
                         <h5>전체 사용자</h5>
-                        <h2>{users.toLocaleString()}명</h2>
+                        <h2>{userStats?.total_users?.toLocaleString() || 0}명</h2>
                     </div>
                     <div className="card stats">
                         <h5>신규 사용자</h5>
-                        <h2>{newUsers.toLocaleString()}명</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <h2>{userStats?.new_users_7d?.toLocaleString() || 0}명</h2>
+                            <span style={{ color: userStats?.change_direction === 'UP' ? 'green' : 'red', fontSize: '14px', fontWeight: 'bold' }}>
+                                {userStats?.change_direction === 'UP' ? '▲' : '▼'} {userStats?.new_users_7d_change_rate || 0}%
+                            </span>
+                        </div>
                     </div>
                     <div className="card stats">
                         <h5>에러 로그 현황</h5>
-                        <h2>{errorLogs.toLocaleString()}건</h2>
+                        <h2>{errorCount.toLocaleString()}건</h2>
                     </div>
                 </div>
                 <div className="row">
                     <div className="card ocr">
                         <h5>OCR 인식률</h5>
+                        {ocrStats ? (
+                            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px', color: '#1f2937' }}>
+                                
+                            </div>
+                        ) : (
+                            <div style={{ marginTop: '20px', textAlign: 'center', color: '#999' }}>데이터 없음</div>
+                        )}
                     </div>
                     <div className="card">
                         <h5>공지사항</h5>
-                        <ul>
-                            <li>새로운 기능 업데이트</li>
-                            <li>서버 점검 완료</li>
-                            <li>Q&A 이용 규칙</li>
+                        <ul className="dashboard-notice-list">
+                            {announcements.length === 0 && <li style={{ padding: '20px', color: '#aaa', justifyContent: 'center' }}>최근 등록된 공지가 없습니다.</li>}
+                            {announcements.map((item) => (
+                                <li key={item.announcement_id}>
+                                    <Link to={`/notice/${item.announcement_id}`}>
+                                        <span style={{ fontWeight: '500' }}>
+                                            <span style={{ color: '#888', marginRight: '5px' }}>[{categoryLabels[item.category]}]</span>
+                                            {item.title}
+                                        </span>
+                                        <span className="notice-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
                 <div className="card error">
-                    <h5>에러 로그 관리</h5>
-                    <table>
+                    <h5>미해결 에러 로그</h5>
+                    <table className="dashboard-error-table">
                         <thead>
                             <tr>
                                 <th>발생 일시</th>
                                 <th>에러 유형</th>
-                                <th>타임스탬프</th>
+                                <th>에러 메시지</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>2026-02-24 16:32</td> 
-                                <td>Warning</td>
-                                <td>관리자 로그인 시도 중 인증 실패 발생</td>
-                            </tr>
-                            <tr>
-                                <td>2024-06-02</td>
-                                <td>데이터베이스 오류</td>
-                                <td>공지사항 조회 시 데이터베이스 연결 오류 발생</td>
-                            </tr>
-                            <tr>
-                                <td>2024-06-03</td>
-                                <td>OCR 인식 실패</td>
-                                <td>OCR 처리 중 이미지 인식 실패 발생</td>
-                            </tr>
+                            {errorLogs.length === 0 && (
+                                <tr>
+                                    <td colSpan={3} style={{ textAlign: 'center', padding: '20px', color: '#aaa' }}>미해결 에러가 없습니다.</td>
+                                </tr>
+                            )}
+                            {errorLogs.map(log => (
+                                <tr key={log.log_id}>
+                                    <td>{new Date(log.created_at).toLocaleString()}</td>
+                                    <td>
+                                        <span style={{
+                                            color: log.error_type === 'ERROR' ? '#ef4444' : '#f5a623',
+                                            fontWeight: 'bold',
+                                            padding: '4px 8px',
+                                            backgroundColor: log.error_type === 'ERROR' ? '#fee2e2' : '#fef3c7',
+                                            borderRadius: '4px',
+                                            fontSize: '12px'
+                                        }}>{log.error_type}</span>
+                                    </td>
+                                    <td>{log.error_message}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
