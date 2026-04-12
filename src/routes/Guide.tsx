@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-type FAQ = {
+type Guidetype = {
     faq_id: number;
     title: string;
     created_by: number;
@@ -10,7 +10,7 @@ type FAQ = {
 };
 
 function Guide() {
-    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [faqs, setFaqs] = useState<Guidetype[]>([]);
     const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: 0 });
     const [keyword, setKeyword] = useState("");
     const [isLoading, setIsLoading] = useState(false);

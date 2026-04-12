@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pin } from "lucide-react";
 import axios from "axios";
-import { useContext } from "react";
 import { useAuth } from "../contexts/AuthContext";
+
+// Mock data (for development/testing purposes)
+import { announcements as mockAnnouncements, pinned_announcements as mockPinnedAnnouncements } from "../mocks/announcements";
 
 export type Announcement = {
     announcement_id: number;
@@ -29,39 +31,9 @@ function Notice() {
     const [category, setCategory] = useState<typeof categories[number]>("ALL");
     const [keyword, setKeyword] = useState("");
 
-    const [pinnedAnnouncements, setPinnedAnnouncements] = useState<Announcement[]>([
-            
-        {
-            announcement_id: 2,
-            title: "제품 등록 시 주의사항 안내",
-            category: "NOTICE",
-            is_pinned: 1,
-            is_new: false,
-            is_read: true,
-            created_at: "2026-03-26"
-        },
-    ]);
-    const [announcements, setAnnouncements] = useState<Announcement[]>([
-    {
-        announcement_id: 1,
-        title: "새로운 기능 업데이트",
-        category: "UPDATE",
-        is_pinned: 0,
-        is_new: true,
-        is_read: false,
-        created_at: "2026-03-25"
-    },
-    {
-        announcement_id: 3,
-        title: "서버 점검 완료",
-        category: "MAINTENANCE",
-        is_pinned: 0,
-        is_new: false,
-        is_read: false,
-        created_at: "2026-03-24"
-    }
-    ]);
-    const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: 0 });
+    const [pinnedAnnouncements, setPinnedAnnouncements] = useState<Announcement[]>(mockPinnedAnnouncements);
+    const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
+    const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: mockPinnedAnnouncements.length + mockAnnouncements.length });
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -88,7 +60,9 @@ function Notice() {
     };
 
     useEffect(() => {
-        fetchAnnouncements();
+        // fetchAnnouncements();
+        setAnnouncements(mockAnnouncements.filter(a => category === "ALL" || a.category === category) as Announcement[]);
+        setPinnedAnnouncements(mockPinnedAnnouncements.filter(a => category === "ALL" || a.category === category) as Announcement[]);
     }, [category, pagination.current_page]);
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -123,7 +97,7 @@ function Notice() {
                             onKeyDown={handleSearch}
                         />
                     </div>
-                    <button className="notice-new-btn">새 공지 작성</button>
+                    <button className="notice-new-btn" onClick={() => navigate('/notice/new')}>새 공지 작성</button>
                 </div>
 
                 <div className="card notice-card">
@@ -149,7 +123,7 @@ function Notice() {
                                     <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)} style={{ cursor: 'pointer', borderBottom: '1px solid #e3e7ee' }}>
                                         <td style={{ textAlign: 'center' }}><Pin size={16} color="#43ABE5" style={{ display: 'inline' }} /></td>
                                         <td className="notice-title" style={{ fontWeight: 'bold', color: '#1f2937' }}>
-                                            {item.title}
+                                            <span style={{color:'gray'}}>[{categoryLabels[item.category]}]</span> {item.title}
                                             {item.is_new && <span className="notice-badge">N</span>}
                                         </td>
                                         <td style={{ textAlign: 'center' }}>{adminAccount}</td>
@@ -161,10 +135,10 @@ function Notice() {
                                     <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)} style={{ cursor: 'pointer', borderBottom: '1px solid #e3e7ee' }}>
                                         <td style={{ textAlign: 'center' }}>{item.announcement_id}</td>
                                         <td className="notice-title" style={{ color: '#374151' }}>
-                                            {item.title}
+                                            <span style={{color:'gray'}}>[{categoryLabels[item.category]}]</span> {item.title}
                                             {item.is_new && <span className="notice-badge">N</span>}
                                         </td>
-                                        <td style={{ textAlign: 'center' }}>{categoryLabels[item.category]}</td>
+                                        <td style={{ textAlign: 'center' }}>{adminAccount}</td>
                                         <td style={{ textAlign: 'center', color: '#6b7280' }}>{new Date(item.created_at).toLocaleDateString()}</td>
                                     </tr>
                                 ))}
@@ -172,7 +146,7 @@ function Notice() {
                         </table>
                     )}
 
-                    {pagination.total_pages > 1 && (
+                    {pagination.total_pages > 0 && (
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '30px', marginBottom: '20px' }}>
                             {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map(pageNum => (
                                 <button

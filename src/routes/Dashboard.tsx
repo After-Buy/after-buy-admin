@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react"
 import axios from "axios";
 import { Link } from "react-router-dom";
+import {
+  PieChart, Pie, Tooltip, 
+  Sector,
+  LabelList
+} from 'recharts';
+
+import { announcements as mockAnnouncements} from "../mocks/announcements";
+
 
 type UserStats = {
     total_users: number;
@@ -35,15 +43,7 @@ type ErrorLog = {
 function Dashboard() {
     const [userStats, setUserStats] = useState<UserStats | null>(null);
     const [ocrStats, setOcrStats] = useState<OcrStats | null>(null);
-    const [announcements, setAnnouncements] = useState<Announcement[]>([
-        {
-        announcement_id: 1,
-        title: "새로운 기능 업데이트",
-        category: "UPDATE",
-        is_pinned: 0,
-        created_at: "2026-03-25"
-    },
-    ]);
+    const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
     const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
     const [errorCount, setErrorCount] = useState(0);
 
@@ -54,6 +54,14 @@ function Dashboard() {
         MAINTENANCE: "점검",
         UPDATE: "업데이트"
     };
+
+    const colors = ['#49aaff', '#FF8042','#ff4343'];
+
+    const customSector = (props: any) => (
+        <Sector {...props} fill={colors[props.index % colors.length]} />
+    );
+
+
 
     useEffect(() => {
         axios.get('/api/admin/dashboard', { withCredentials: true })
@@ -73,6 +81,20 @@ function Dashboard() {
             .finally(() => {
                 setIsLoading(false);
             });
+        // Dock data for OCR pie chart    
+        setOcrStats({
+            total_attempts: 1000,
+            success_count: 850,
+            modified_count: 100,
+            failure_count: 50,
+            success_rate: 85
+        });
+        setUserStats({
+            total_users: 150,
+            new_users_7d: 13,
+            new_users_7d_change_rate: 12.3,
+            change_direction: 'UP'
+        });
     }, []);
 
     if (isLoading) return <div>로딩 중...</div>;
@@ -104,8 +126,54 @@ function Dashboard() {
                     <div className="card ocr">
                         <h5>OCR 인식률</h5>
                         {ocrStats ? (
-                            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px', color: '#1f2937' }}>
-                                
+                            <div className="dashboard-ocr-table">
+                                <PieChart
+                                    responsive
+                                    style={{ width: '100%', maxWidth: 360, aspectRatio: 1 }}
+                                    >
+                                    <Pie
+                                        data={ocrStats ? [
+                                            { name: '성공', value: ocrStats.success_count },
+                                            { name: '오인식', value: ocrStats.modified_count },
+                                            { name: '실패', value: ocrStats.failure_count }
+                                        ] : []}
+                                        dataKey="value"
+                                        nameKey="name"
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius="75%"
+                                        shape={customSector}
+                                    >
+                                        <LabelList dataKey="name" position="outside" />
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', marginTop: '20px' }}>
+                                    <div className="dashboard-ocr-label">
+                                        <div>
+                                            <span className="dot" style={{backgroundColor: colors[0]}}
+                                            />
+                                            <span style={{ marginLeft: '10px'}}>성공</span>
+                                        </div>
+                                        <span>{ocrStats.success_count}건</span>
+                                    </div>
+                                    <div className="dashboard-ocr-label">
+                                        <div>
+                                            <span className="dot" style={{backgroundColor: colors[1]}}
+                                            />
+                                            <span style={{ marginLeft: '10px'}}>오인식</span>
+                                        </div>
+                                        <span>{ocrStats.modified_count}건</span>
+                                    </div>
+                                    <div className="dashboard-ocr-label">
+                                        <div>
+                                            <span className="dot" style={{backgroundColor: colors[2]}}
+                                            />
+                                            <span style={{ marginLeft: '10px'}}>실패</span>
+                                        </div>
+                                        <span>{ocrStats.failure_count}건</span>
+                                    </div>
+                                </div>
                             </div>
                         ) : (
                             <div style={{ marginTop: '20px', textAlign: 'center', color: '#999' }}>데이터 없음</div>
