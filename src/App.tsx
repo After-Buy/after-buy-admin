@@ -12,6 +12,7 @@ import Log from './routes/Log.tsx';
 import Ocr from './routes/Ocr.tsx';
 import Login from './routes/Login.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
+import GuideCreate from './routes/GuideCreate.tsx';
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="notice/:id" element={<NoticeDetail />} />
           <Route path="error" element={<Error />} />
           <Route path="guide" element={<Guide />} />
+          <Route path="guide/new" element={<GuideCreate />} />
           <Route path="guide/:id" element={<GuideDetail />} />
           <Route path="log" element={<Log />} />
           <Route path="ocr" element={<Ocr />} />

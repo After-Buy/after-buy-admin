@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 type Guidetype = {
     faq_id: number;
@@ -15,6 +16,7 @@ function Guide() {
     const [keyword, setKeyword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const navigate = useNavigate()
     const fetchFaqs = () => {
         setIsLoading(true);
         axios.get('/api/admin/faqs', {
@@ -50,17 +52,16 @@ function Guide() {
         <div className="guide-page">
             <h2>이용 안내 (FAQ)</h2>
             
-            <div className="container" style={{marginTop: '30px'}}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+            <div className="container">
+                <div className="toolbar">
                     <input
                         className="search-box"
-                        style={{padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', width: '300px'}}
                         value={keyword}
-                        placeholder="검색어 입력 후 Enter"
+                        placeholder="검색어 입력"
                         onChange={(e) => setKeyword(e.target.value)}
                         onKeyDown={handleSearch}
                     />
-                    <button style={{marginLeft: '10px', padding: '8px 16px', backgroundColor: '#43ABE5', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}>새 FAQ 작성</button>
+                    <button className="new-btn" onClick={()=>(navigate('/guide/new'))}>새 FAQ 작성</button>
                 </div>
 
                 <div className="card" style={{padding: '0', overflow: 'hidden'}}>

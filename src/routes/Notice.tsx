@@ -77,8 +77,8 @@ function Notice() {
             <h2>공지사항</h2>
 
             <div className="container notice-container">
-                <div className="notice-toolbar">
-                    <div className="notice-toolbar-left">
+                <div className="toolbar">
+                    <div className="toolbar-left">
                         <select value={category} onChange={(e) => {
                             setCategory(e.target.value as typeof categories[number]);
                             setPagination(prev => ({ ...prev, current_page: 1 }));
@@ -97,7 +97,7 @@ function Notice() {
                             onKeyDown={handleSearch}
                         />
                     </div>
-                    <button className="notice-new-btn" onClick={() => navigate('/notice/new')}>새 공지 작성</button>
+                    <button className="new-btn" onClick={() => navigate('/notice/new')}>새 공지 작성</button>
                 </div>
 
                 <div className="card notice-card">

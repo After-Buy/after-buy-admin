@@ -1,17 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-    announcement_details as mockAnnouncementDetails,
-    announcements as mockAnnouncements,
-    pinned_announcements as mockPinnedAnnouncements
-} from "../mocks/announcements";
 import MDEditor from '@uiw/react-md-editor';
 
 export type AnnouncementDetail = {
     announcement_id: number;
     title: string;
-    category: "NOTICE" | "MAINTENANCE" | "UPDATE";
+    category: string;
     content: string;
     is_pinned: number;
     is_new: boolean;
@@ -20,14 +15,13 @@ export type AnnouncementDetail = {
     updated_at: string;
 };
 
-
-function NoticeDetail() {
+function GuideDetail() {
     const navigate = useNavigate();
     const { id } = useParams();
     const [detail, setDetail] = useState<AnnouncementDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
-    
+
     // Edit state
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState("");
@@ -36,41 +30,20 @@ function NoticeDetail() {
     const [editIsPinned, setEditIsPinned] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const categories = ["ALL", "NOTICE", "MAINTENANCE", "UPDATE"] as const;
-    const categoryLabels: Record<typeof categories[number], string> = {
-        ALL: "전체",
-        NOTICE: "안내",
-        MAINTENANCE: "점검",
-        UPDATE: "업데이트"
-    };
     useEffect(() => {
         if (!id) return;
         setIsLoading(true);
-
-        // mock data
-        const fallback = () => {
-            const found = mockAnnouncementDetails.find(item => item.announcement_id === Number(id));
-            if (found) {
-                setDetail(found);
-                setErrorMsg('');
-            } else {
-                setDetail(null);
-                setErrorMsg("데이터를 불러올 수 없습니다.");
-            }
-        };
-
         axios.get(`/api/admin/announcements/${id}`, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setDetail(res.data.data);
-                    setErrorMsg('');
                 } else {
-                    fallback();
+                    setErrorMsg("데이터를 불러올 수 없습니다.");
                 }
             })
             .catch(err => {
                 console.error("공지사항 상세 로드 오류", err);
-                fallback();
+                setErrorMsg("공지사항을 찾을 수 없습니다.");
             })
             .finally(() => setIsLoading(false));
     }, [id]);
@@ -92,7 +65,6 @@ function NoticeDetail() {
     const handleEditClick = () => {
         if (detail) {
             setEditTitle(detail.title);
-            setEditCategory(detail.category);
             setEditContent(detail.content);
             setEditIsPinned(detail.is_pinned === 1);
             setIsEditing(true);
@@ -108,81 +80,6 @@ function NoticeDetail() {
         }
 
         setIsSubmitting(true);
-
-        const updateMockData = () => {
-            const numId = Number(id);
-            const index = mockAnnouncementDetails.findIndex(item => item.announcement_id === numId);
-            if (index !== -1) {
-                mockAnnouncementDetails[index] = {
-                    ...mockAnnouncementDetails[index],
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0,
-                    updated_at: new Date().toISOString()
-                };
-            }
-            
-            let foundItem: any = null;
-            const lIndex = mockAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (lIndex !== -1) {
-                foundItem = { ...mockAnnouncements[lIndex] };
-                mockAnnouncements.splice(lIndex, 1);
-            }
-            
-            const pIndex = mockPinnedAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (pIndex !== -1) {
-                if (!foundItem) foundItem = { ...mockPinnedAnnouncements[pIndex] };
-                mockPinnedAnnouncements.splice(pIndex, 1);
-            }
-            
-            if (foundItem) {
-                foundItem.title = editTitle.trim();
-                foundItem.category = editCategory;
-                foundItem.is_pinned = editIsPinned ? 1 : 0;
-                
-                if (editIsPinned) {
-                    mockPinnedAnnouncements.push(foundItem);
-                } else {
-                    mockAnnouncements.push(foundItem);
-                }
-            }
-            
-            setDetail({
-                ...detail!,
-                title: editTitle.trim(),
-                category: editCategory,
-                content: editContent.trim(),
-                is_pinned: editIsPinned ? 1 : 0,
-                updated_at: new Date().toISOString()
-            });
-            alert("수정사항이 반영되었습니다.");
-            setIsEditing(false);
-        };
-
-        try {
-            const res = await axios.put(
-                `/api/admin/announcements/${id}`,
-                {
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0
-                },
-                { withCredentials: true }
-            );
-
-            if (res.data.success) {
-                updateMockData();
-            } else {
-                updateMockData(); // fallback
-            }
-        } catch (error) {
-            console.error("공지 수정 오류", error);
-            updateMockData(); // fallback
-        } finally {
-            setIsSubmitting(false);
-        }
     };
 
     if (isLoading) return <div style={{ padding: '50px', textAlign: 'center' }}>로딩 중...</div>;
@@ -256,14 +153,14 @@ function NoticeDetail() {
     }
 
     return (
-        <div className="notice-page">
+        <div className="guide-page">
             <h2 style={{ cursor: 'pointer', display: 'inline-block' }} onClick={() => navigate('/notice')}>공지사항</h2>
 
             <div className="container">
                 <div className="detail-card">
                     <div className="detail-header">
                         <h3>
-                            <span style={{ color: '#888', marginRight: '8px', fontSize: '18px' }}>[{categoryLabels[detail.category]}]</span>
+                            <span style={{ color: '#888', marginRight: '8px', fontSize: '18px' }}>[{detail.category}]</span>
                             {detail.title}
                         </h3>
                         <div className="detail-meta">
@@ -272,12 +169,12 @@ function NoticeDetail() {
                         </div>
                     </div>
 
-                    <div className="detail-body" data-color-mode="light" style={{ marginTop: '30px', padding: '30px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                    <div className="detail-body" style={{ whiteSpace: 'pre-line', marginTop: '30px', padding: '30px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
                         <MDEditor.Markdown source={detail.content} style={{ backgroundColor: 'transparent', color: '#333' }} />
                     </div>
 
                     <div className="detail-actions">
-                        <button className="detail-btn detail-btn-close" onClick={() => navigate(-1)}>
+                        <button className="detail-btn notice-detail-btn-close" onClick={() => navigate(-1)}>
                             닫기
                         </button>
                         <button className="detail-btn detail-btn-delete" onClick={handleDelete}>
@@ -293,4 +190,4 @@ function NoticeDetail() {
     )
 }
 
-export default NoticeDetail;
+export default GuideDetail;
