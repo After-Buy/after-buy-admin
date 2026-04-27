@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// api 명세서 참고해서 구성하였으나 추후 연동 시 재확인 필요
 type Guidetype = {
     faq_id: number;
     title: string;
@@ -50,7 +51,7 @@ function Guide() {
 
     return (
         <div className="guide-page">
-            <h2>이용 안내 (FAQ)</h2>
+            <h2>이용 안내</h2>
             
             <div className="container">
                 <div className="toolbar">
@@ -61,7 +62,7 @@ function Guide() {
                         onChange={(e) => setKeyword(e.target.value)}
                         onKeyDown={handleSearch}
                     />
-                    <button className="new-btn" onClick={()=>(navigate('/guide/new'))}>새 FAQ 작성</button>
+                    <button className="new-btn" onClick={()=>(navigate('/guide/new'))}>이용 안내 작성</button>
                 </div>
 
                 <div className="card" style={{padding: '0', overflow: 'hidden'}}>
@@ -77,7 +78,7 @@ function Guide() {
                             <tbody>
                                 {faqs.length === 0 && (
                                     <tr>
-                                        <td colSpan={3} style={{textAlign: 'center', padding: '30px', color: '#777'}}>FAQ가 없습니다.</td>
+                                        <td colSpan={3} style={{textAlign: 'center', padding: '30px', color: '#777'}}>이용 안내가 없습니다.</td>
                                     </tr>
                                 )}
                                 {faqs.map(faq => (

@@ -49,12 +49,11 @@ function Log() {
                         <table style={{ width: '100%', margin: '0', borderCollapse: 'collapse' }}>
                             <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                                 <tr>
+                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>로그 번호</th>
                                     <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>ID</th>
-                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>계정</th>
-                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>결과</th>
-                                    <th style={{ padding: '16px', textAlign: 'left', color: '#556978', fontWeight: 'bold' }}>실패 사유</th>
-                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>접속 상태</th>
                                     <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>로그인 일시</th>
+                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>결과</th>
+                                    <th style={{ padding: '16px', textAlign: 'center', color: '#556978', fontWeight: 'bold' }}>접속 상태</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,15 +66,13 @@ function Log() {
                                     <tr key={log.log_id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>{log.log_id}</td>
                                         <td style={{ padding: '16px', textAlign: 'center', fontWeight: '500' }}>{log.admin_account}</td>
+                                        <td style={{ padding: '16px', textAlign: 'center', color: '#6b7280' }}>{new Date(log.login_at).toLocaleString()}</td>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>
                                             {log.is_success === 1 ? (
                                                 <span style={{ color: '#10b981', fontWeight: 'bold' }}>성공</span>
                                             ) : (
                                                 <span style={{ color: '#ef4444', fontWeight: 'bold' }}>실패</span>
                                             )}
-                                        </td>
-                                        <td style={{ padding: '16px', color: '#6b7280', fontSize: '14px', maxWidth: '200px' }}>
-                                            {log.failure_reason || '-'}
                                         </td>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>
                                             <span style={{
@@ -87,7 +84,7 @@ function Log() {
                                                 fontWeight: 'bold'
                                             }}>{log.login_status}</span>
                                         </td>
-                                        <td style={{ padding: '16px', textAlign: 'center', color: '#6b7280' }}>{new Date(log.login_at).toLocaleString()}</td>
+                                        
                                     </tr>
                                 ))}
                             </tbody>

@@ -32,7 +32,7 @@ function GuideCreate() {
 
             if (res.data.success) {
                 alert("이용 안내가 등록되었습니다.");
-                navigate("/notice");
+                navigate("/guide");
                 return;
             }
 
@@ -46,18 +46,18 @@ function GuideCreate() {
     };
 
     return (
-        <div className="notice-page">
+        <div>
             <h2 style={{ cursor: "pointer", display: "inline-block" }} onClick={() => navigate("/guide")}>
                 이용 안내 작성
             </h2>
 
-            <div className="container notice-container">
-                <form className="notice-form-card" onSubmit={handleSubmit}>
-                    <div className="notice-form-row">
-                        <label htmlFor="notice-title">제목</label>
+            <div className="container detail-container">
+                <form className="detail-form-card" onSubmit={handleSubmit}>
+                    <div className="detail-form-row">
+                        <label htmlFor="detail-title">제목</label>
                         <input
-                            id="notice-title"
-                            className="notice-form-input"
+                            id="guide-title"
+                            className="detail-form-input"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="이용 안내 제목을 입력해 주세요"
@@ -65,8 +65,8 @@ function GuideCreate() {
                     </div>
 
                     
-                    <div className="notice-form-row">
-                        <label htmlFor="notice-content">내용</label>
+                    <div className="detail-form-row">
+                        <label htmlFor="detail-content">내용</label>
                         <div className="markarea">
                             <div data-color-mode="light">
                                 <MDEditor height={865} value={content} onChange={(value) => setContent(value || "")} />
@@ -74,11 +74,11 @@ function GuideCreate() {
                         </div>
                     </div>
 
-                    <div className="notice-form-actions">
-                        <button type="button" className="notice-detail-btn notice-detail-btn-close" onClick={() => navigate("/guide")}>
+                    <div className="detail-form-actions">
+                        <button type="button" className="detail-btn detail-btn-close" onClick={() => navigate("/guide")}>
                             취소
                         </button>
-                        <button type="submit" className="notice-detail-btn notice-detail-btn-edit" disabled={isSubmitting}>
+                        <button type="submit" className="detail-btn detail-btn-edit" disabled={isSubmitting}>
                             {isSubmitting ? "등록 중..." : "등록"}
                         </button>
                     </div>

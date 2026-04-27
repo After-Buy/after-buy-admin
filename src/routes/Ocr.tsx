@@ -42,6 +42,8 @@ function Ocr() {
     const [brushRange, setBrushRange] = useState({ startIndex: 0, endIndex: 0 });
     const [isLoading, setIsLoading] = useState(false);
 
+    const totalFieldModifiedCount = fieldStats.reduce((acc, curr) => acc + curr.modified_count, 0);
+
     const fetchStats = () => {
         setIsLoading(true);
         // 임시 더미 데이터 사용
@@ -162,30 +164,51 @@ function Ocr() {
                                 })}
                             </div>
 
-                            <div className="row">
+                            <div className="row" style={{ width: '60%' }}>
                                 <div style={{ flex: 1 }}>
                                     <h5 style={{ textAlign: 'center', marginBottom: '20px', color: '#374151', fontWeight: 'bold' }}>항목별 오인식 건수</h5>
-                                    <div style={{ width: '100%', height: 350 }}>
+                                    <div style={{ width: '100%', height: 400 }}>
                                         <ResponsiveContainer>
-                                            <BarChart data={fieldStats} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                                            <BarChart data={fieldStats} margin={{ top: 40, right: 30, left: 0, bottom: 20 }}>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                                                 <XAxis dataKey="field_name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
                                                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                                                <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                                                <Tooltip
+                                                    cursor={{ fill: '#f3f4f6' }}
+                                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                    formatter={(value: any) => {
+                                                        const numValue = Number(value);
+                                                        const percent = totalFieldModifiedCount > 0 ? ((numValue / totalFieldModifiedCount) * 100).toFixed(1) : 0;
+                                                        return [`${numValue}건 (${percent}%)`, '오인식 건수'];
+                                                    }}
+                                                />
                                                 <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="square" />
                                                 <Bar dataKey="modified_count" fill="#9f7aea" radius={[4, 4, 0, 0]} barSize={40} name="오인식 건수">
-                                                    <LabelList dataKey="modified_count" position="top" fill="#6b7280" fontSize={12} />
+                                                    <LabelList
+                                                        dataKey="modified_count"
+                                                        position="top"
+                                                        fill="#6b7280"
+                                                        fontSize={12}
+                                                        formatter={(value: any) => {
+                                                            const numValue = Number(value);
+                                                            const percent = totalFieldModifiedCount > 0 ? ((numValue / totalFieldModifiedCount) * 100).toFixed(1) : 0;
+                                                            return `${numValue}건 (${percent}%)`;
+                                                        }}
+                                                    />
                                                 </Bar>
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
                                 </div>
 
+
+                            </div>
+                            <div className="row" style={{ marginTop: '50px' }}>
                                 <div style={{ flex: 1 }}>
-                                    <h5 style={{ textAlign: 'center', marginBottom: '20px', color: '#374151', fontWeight: 'bold' }}>인식 실패 건수</h5>
+                                    <h5 style={{ textAlign: 'center', margin: '0 50px 0px 20px', color: '#374151', fontWeight: 'bold' }}>인식 실패 건수</h5>
                                     <div style={{ width: '100%', height: 350 }}>
                                         <ResponsiveContainer>
-                                            <LineChart data={dailyTrend} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                            <LineChart data={dailyTrend} margin={{ top: 20, right: 100, left: 50, bottom: 5 }}>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                                                 <XAxis
                                                     dataKey="time"
@@ -209,10 +232,11 @@ function Ocr() {
                                                         const d = new Date(label);
                                                         return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
                                                     }}
+                                                    formatter={(value: any, name: any) => [`${value}건`, name]}
                                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                                                 />
                                                 <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" verticalAlign="top" />
-                                                <Line type="monotone" dataKey="failure_count" stroke="#9f7aea" strokeWidth={2} dot={period === '30d' ? { stroke: '#9f7aea', strokeWidth: 2, fill: 'white', r: 4 } : false} activeDot={{ r: 6, fill: '#9f7aea' }} name="인식 실패" />
+                                                <Line type="monotone" dataKey="failure_count" stroke="#9f7aea" strokeWidth={2} dot={period === '30d' ? { stroke: '#9f7aea', strokeWidth: 2, fill: 'white', r: 4 } : false} activeDot={{ r: 6, fill: '#9f7aea' }} name="인식 실패 건수" />
                                                 <Brush dataKey="time" tickFormatter={(timeStr) => {
                                                     const date = new Date(timeStr);
                                                     return `${date.getFullYear().toString().slice(2)}년 ${date.getMonth() + 1}월`;
