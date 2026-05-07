@@ -21,9 +21,7 @@ function GuideDetail() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState("");
-    const [editCategory, setEditCategory] = useState<"NOTICE" | "MAINTENANCE" | "UPDATE">("NOTICE");
     const [editContent, setEditContent] = useState("");
-    const [editIsPinned, setEditIsPinned] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
