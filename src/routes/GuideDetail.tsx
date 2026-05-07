@@ -47,7 +47,7 @@ function GuideDetail() {
     const handleDelete = async () => {
         if (window.confirm('정말 삭제하시겠습니까?')) {
             try {
-                const res = await axios.delete(`/api/admin/guides/${id}`, { withCredentials: true });
+                const res = await axios.delete(`/api/admin/faqs/${id}`, { withCredentials: true });
                 if (res.data.success) {
                     alert('삭제되었습니다.');
                     navigate('/guide');
@@ -108,30 +108,6 @@ function GuideDetail() {
                 </h2>
                 <div className="container">
                     <form className="detail-form-card" onSubmit={handleEditSubmit}>
-                        <div className="detail-form-grid">
-                            <div className="detail-form-row">
-                                <label htmlFor="detail-category">카테고리</label>
-                                <select
-                                    id="guide-category"
-                                    className="detail-form-input"
-                                    value={editCategory}
-                                    onChange={(e) => setEditCategory(e.target.value as "NOTICE" | "MAINTENANCE" | "UPDATE")}
-                                >
-                                    <option value="NOTICE">안내</option>
-                                    <option value="MAINTENANCE">점검</option>
-                                    <option value="UPDATE">업데이트</option>
-                                </select>
-                            </div>
-
-                            <label className="detail-form-check">
-                                <input
-                                    type="checkbox"
-                                    checked={editIsPinned}
-                                    onChange={(e) => setEditIsPinned(e.target.checked)}
-                                />
-                                상단 고정
-                            </label>
-                        </div>
 
                         <div className="detail-form-row">
                             <label htmlFor="detail-title">제목</label>
@@ -188,7 +164,7 @@ function GuideDetail() {
                     </div>
 
                     <div className="detail-actions">
-                        <button className="detail-btn notice-detail-btn-close" onClick={() => navigate(-1)}>
+                        <button className="detail-btn detail-btn-close" onClick={() => navigate(-1)}>
                             닫기
                         </button>
                         <button className="detail-btn detail-btn-delete" onClick={handleDelete}>

@@ -1,11 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-    announcement_details as mockAnnouncementDetails,
-    announcements as mockAnnouncements,
-    pinned_announcements as mockPinnedAnnouncements
-} from "../mocks/announcements";
 import MDEditor from '@uiw/react-md-editor';
 
 export type AnnouncementDetail = {
@@ -53,10 +48,12 @@ function NoticeDetail() {
                     setDetail(res.data.data);
                     setErrorMsg('');
                 } else {
+                    setErrorMsg('데이터를 불러오는 데 실패했습니다.');
                 }
             })
             .catch(err => {
                 console.error("공지사항 상세 로드 오류", err);
+                setErrorMsg('데이터를 불러오는 데 실패했습니다.');
             })
             .finally(() => setIsLoading(false));
     }, [id]);
@@ -95,80 +92,32 @@ function NoticeDetail() {
 
         setIsSubmitting(true);
 
-        const updateMockData = () => {
-            const numId = Number(id);
-            const index = mockAnnouncementDetails.findIndex(item => item.announcement_id === numId);
-            if (index !== -1) {
-                mockAnnouncementDetails[index] = {
-                    ...mockAnnouncementDetails[index],
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0,
-                    updated_at: new Date().toISOString()
-                };
-            }
-            
-            let foundItem: any = null;
-            const lIndex = mockAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (lIndex !== -1) {
-                foundItem = { ...mockAnnouncements[lIndex] };
-                mockAnnouncements.splice(lIndex, 1);
-            }
-            
-            const pIndex = mockPinnedAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (pIndex !== -1) {
-                if (!foundItem) foundItem = { ...mockPinnedAnnouncements[pIndex] };
-                mockPinnedAnnouncements.splice(pIndex, 1);
-            }
-            
-            if (foundItem) {
-                foundItem.title = editTitle.trim();
-                foundItem.category = editCategory;
-                foundItem.is_pinned = editIsPinned ? 1 : 0;
-                
-                if (editIsPinned) {
-                    mockPinnedAnnouncements.push(foundItem);
-                } else {
-                    mockAnnouncements.push(foundItem);
-                }
-            }
-            
-            setDetail({
-                ...detail!,
+    
+        await axios.put(
+            `/api/admin/announcements/${id}`,
+            {
                 title: editTitle.trim(),
                 category: editCategory,
                 content: editContent.trim(),
-                is_pinned: editIsPinned ? 1 : 0,
-                updated_at: new Date().toISOString()
-            });
-            alert("수정사항이 반영되었습니다.");
-            setIsEditing(false);
-        };
-
-        try {
-            const res = await axios.put(
-                `/api/admin/announcements/${id}`,
-                {
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0
-                },
-                { withCredentials: true }
-            );
-
-            if (res.data.success) {
-                updateMockData();
-            } else {
-                updateMockData(); // fallback
-            }
-        } catch (error) {
-            console.error("공지 수정 오류", error);
-            updateMockData(); // fallback
-        } finally {
-            setIsSubmitting(false);
-        }
+                isPinned: editIsPinned ? 1 : 0
+            },
+            { withCredentials: true }
+            ).then(res => {
+                if (res.data.success) {
+                    setDetail(prev => prev ? {
+                        ...prev,
+                        title: editTitle.trim(),
+                        category: editCategory,
+                        content: editContent.trim(),
+                        isPinned: editIsPinned ? 1 : 0
+                    } : prev);
+                    alert("수정사항이 반영되었습니다.");
+                    setIsEditing(false);
+                    navigate('/notice/' + id);}
+            }).catch(error => {
+                console.error("공지 수정 오류", error);
+                alert("수정 중 오류가 발생했습니다.");
+            })
     };
 
     if (isLoading) return <div style={{ padding: '50px', textAlign: 'center' }}>로딩 중...</div>;

@@ -7,7 +7,6 @@ import {
   LabelList
 } from 'recharts';
 
-import { announcements as mockAnnouncements} from "../mocks/announcements";
 
 
 type UserStats = {
@@ -43,7 +42,7 @@ type ErrorLog = {
 function Dashboard() {
     const [userStats, setUserStats] = useState<UserStats | null>(null);
     const [ocrStats, setOcrStats] = useState<OcrStats | null>(null);
-    const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
+    const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
     const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
     const [errorCount, setErrorCount] = useState(0);
 
@@ -81,20 +80,23 @@ function Dashboard() {
             .finally(() => {
                 setIsLoading(false);
             });
-        // Dock data for OCR pie chart    
-        setOcrStats({
-            total_attempts: 1000,
-            success_count: 850,
-            modified_count: 100,
-            failure_count: 50,
-            success_rate: 85
-        });
-        setUserStats({
-            total_users: 150,
-            new_users_7d: 13,
-            new_users_7d_change_rate: 12.3,
-            change_direction: 'UP'
-        });
+            
+        // mock data for OCR pie chart   
+        setTimeout(() => { 
+            setOcrStats({
+                total_attempts: 1000,
+                success_count: 850,
+                modified_count: 100,
+                failure_count: 50,
+                success_rate: 85
+            });
+            setUserStats({
+                total_users: 150,
+                new_users_7d: 13,
+                new_users_7d_change_rate: 12.3,
+                change_direction: 'UP'
+            });
+        }, 100);
     }, []);
 
     if (isLoading) return <div>로딩 중...</div>;
@@ -182,8 +184,8 @@ function Dashboard() {
                     <div className="card">
                         <h5>공지사항</h5>
                         <ul className="dashboard-notice-list">
-                            {announcements.length === 0 && <li style={{ padding: '20px', color: '#aaa', justifyContent: 'center' }}>최근 등록된 공지가 없습니다.</li>}
-                            {announcements.map((item) => (
+                            {announcements?.length === 0 && <li style={{ padding: '20px', color: '#aaa', justifyContent: 'center' }}>최근 등록된 공지가 없습니다.</li>}
+                            {announcements?.map((item) => (
                                 <li key={item.announcement_id}>
                                     <Link to={`/notice/${item.announcement_id}`}>
                                         <span style={{ fontWeight: '500' }}>

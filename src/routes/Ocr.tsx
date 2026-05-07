@@ -46,6 +46,7 @@ function Ocr() {
 
     const fetchStats = () => {
         setIsLoading(true);
+        
         // 임시 더미 데이터 사용
         setTimeout(() => {
             let m = 1;
