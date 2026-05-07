@@ -47,30 +47,16 @@ function NoticeDetail() {
         if (!id) return;
         setIsLoading(true);
 
-        // mock data
-        const fallback = () => {
-            const found = mockAnnouncementDetails.find(item => item.announcement_id === Number(id));
-            if (found) {
-                setDetail(found);
-                setErrorMsg('');
-            } else {
-                setDetail(null);
-                setErrorMsg("데이터를 불러올 수 없습니다.");
-            }
-        };
-
         axios.get(`/api/admin/announcements/${id}`, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setDetail(res.data.data);
                     setErrorMsg('');
                 } else {
-                    fallback();
                 }
             })
             .catch(err => {
                 console.error("공지사항 상세 로드 오류", err);
-                fallback();
             })
             .finally(() => setIsLoading(false));
     }, [id]);

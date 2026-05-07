@@ -27,7 +27,7 @@ function NoticeCreate() {
                 "/api/admin/announcements",
                 {
                     title: title.trim(),
-                    category,
+                    category: category,
                     content: content.trim(),
                     is_pinned: isPinned ? 1 : 0
                 },

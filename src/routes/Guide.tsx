@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-// api 명세서 참고해서 구성하였으나 추후 연동 시 재확인 필요
 type Guidetype = {
     faq_id: number;
     title: string;
@@ -53,7 +52,7 @@ function Guide() {
         <div className="guide-page">
             <h2>이용 안내</h2>
             
-            <div className="container">
+            <div className="container guide-container">
                 <div className="toolbar">
                     <input
                         className="search-box"
@@ -65,14 +64,15 @@ function Guide() {
                     <button className="new-btn" onClick={()=>(navigate('/guide/new'))}>이용 안내 작성</button>
                 </div>
 
-                <div className="card" style={{padding: '0', overflow: 'hidden'}}>
+                <div className="card guide-card">
                     {isLoading ? <div style={{padding: '50px', textAlign: 'center', color: '#777'}}>로딩 중...</div> : (
-                        <table style={{width: '100%', margin: '0', borderCollapse: 'collapse'}}>
+                        <table className="guide-table">
                             <thead style={{backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb'}}>
                                 <tr>
-                                    <th style={{padding: '16px', textAlign: 'center', width: '80px', color: '#556978', fontWeight: 'bold'}}>ID</th>
-                                    <th style={{padding: '16px', textAlign: 'left', color: '#556978', fontWeight: 'bold'}}>제목</th>
-                                    <th style={{padding: '16px', textAlign: 'center', width: '150px', color: '#556978', fontWeight: 'bold'}}>작성일</th>
+                                    <th>ID</th>
+                                    <th style={{ width: '60%' }}>제목</th>
+                                    <th>작성자</th>
+                                    <th>작성일</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -82,10 +82,11 @@ function Guide() {
                                     </tr>
                                 )}
                                 {faqs.map(faq => (
-                                    <tr key={faq.faq_id} style={{borderBottom: '1px solid #eee', cursor: 'pointer'}} onClick={() => alert('FAQ 상세 구현 준비 (ID: ' + faq.faq_id + ')')}>
-                                        <td style={{padding: '16px', textAlign: 'center'}}>{faq.faq_id}</td>
-                                        <td style={{padding: '16px', color: '#374151', fontWeight: '500'}}>{faq.title}</td>
-                                        <td style={{padding: '16px', textAlign: 'center', color: '#6b7280', fontSize: '14px'}}>{new Date(faq.created_at).toLocaleDateString()}</td>
+                                    <tr key={faq.faq_id} className="guide-row" onClick={() => navigate(`/guide/${faq.faq_id}`)}>
+                                        <td style={{textAlign: 'center'}}>{faq.faq_id}</td>
+                                        <td className="notice-title">{faq.title}</td>
+                                        <td>{faq.created_by}</td>
+                                        <td style={{ textAlign: 'center', color: '#6b7280' }}>{new Date(faq.created_at).toLocaleDateString()}</td>
                                     </tr>
                                 ))}
                             </tbody>

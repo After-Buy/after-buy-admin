@@ -443,6 +443,71 @@ a {
   padding: 18px 0;
 }
 
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 14px;
+  padding: 140px 10px;
+
+  th,
+  td {
+    padding: 12px 10px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: inherit;
+
+
+    svg {
+      align-self: center;
+    }
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 60px;
+    max-width: 60px;
+    text-align: center;
+  }
+
+  th {
+    color: #556978;
+    font-weight: 600;
+    background-color: #f6f8fb;
+  }
+}
+
+.guide-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+}
+
+.guide-category {
+  color: #888;
+}
+
+
+.guide-badge {
+  display: inline-flex;
+  margin-left: 8px;
+  background-color: #ff5d5d;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  box-sizing: border-box;
+  border-radius: 999px;
+  padding: 1px 10px;
+}
+
+.guide-empty {
+  text-align: center;
+  color: #777;
+  padding: 18px 0;
+}
 .detail-card {
   border: 1px solid #ddd;
   border-radius: 10px;

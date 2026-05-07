@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 function Layout() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { logout } = useAuth(); // 전역 로그아웃 함수
+    const { logout, adminAccount} = useAuth(); // 전역 로그아웃 함수
 
     const handleLogout = async () => {
         try { 
@@ -29,6 +29,7 @@ function Layout() {
                     <nav>
                         <h3>After-Buy</h3>
                         <CircleUserRound size={40} style={{alignSelf: "center"}}/>
+                        {adminAccount && <p style={{textAlign: "center", fontWeight: "bold"}}>{adminAccount}</p>}
                         <ul>
                             <li className={`${location.pathname === "/" ? "active" : ""}`}>
                             <Link to="/"><LayoutDashboard size={18} />대시보드</Link></li>
