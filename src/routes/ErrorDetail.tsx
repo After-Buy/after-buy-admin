@@ -19,6 +19,7 @@ function ErrorDetail() {
     const [detail, setDetail] = useState<ErrorLogDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -75,11 +76,58 @@ function ErrorDetail() {
         }
     }
 
+    // 에러 메시지 복사
+    const handleCopy = async () => {
+        if (!detail) return;
+        try {
+            const copyText = `${detail.full_message}`;
+            await navigator.clipboard.writeText(copyText);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+        } catch (err) {
+            console.error('Failed to copy!', err);
+        }
+    };
+
     if (isLoading) return <div style={{ padding: '50px', textAlign: 'center' }}>로딩 중...</div>;
     if (errorMsg || !detail) return <div style={{ padding: '50px', textAlign: 'center', color: 'red' }}>{errorMsg || "데이터가 없습니다."}</div>;
 
     return (
         <div className="error-page">
+            <style>
+                {`
+                @keyframes slideUpFade {
+                    0% { opacity: 0; transform: translate(-50%, 20px); }
+                    10% { opacity: 1; transform: translate(-50%, 0); }
+                    90% { opacity: 1; transform: translate(-50%, 0); }
+                    100% { opacity: 0; transform: translate(-50%, -20px); }
+                }
+                `}
+            </style>
+            {showToast && (
+                <div style={{
+                    position: 'fixed',
+                    bottom: '40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    zIndex: 1000,
+                    animation: 'slideUpFade 3s ease-in-out forwards'
+                }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span style={{ fontWeight: '500' }}>복사 완료</span>
+                </div>
+            )}
             <h2 style={{ cursor: 'pointer', display: 'inline-block' }} onClick={() => navigate('/error')}>에러 로그</h2>
 
             <div className="container" style={{ marginTop: '30px' }}>
@@ -133,7 +181,34 @@ function ErrorDetail() {
                     </div>
 
                     <div>
-                        <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#374151' }}>상세 내용 / 스택 트레이스</h4>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <h4 style={{ margin: 0, fontSize: '16px', color: '#374151' }}>상세 내용 / 스택 트레이스</h4>
+                            <button
+                                onClick={handleCopy}
+                                style={{
+                                    padding: '6px 12px',
+                                    backgroundColor: '#f3f4f6',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '13px',
+                                    color: '#374151',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s',
+                                    fontWeight: '500'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                복사
+                            </button>
+                        </div>
                         <pre style={{
                             padding: '20px',
                             backgroundColor: '#1f2937',
