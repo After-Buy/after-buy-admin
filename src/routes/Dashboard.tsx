@@ -73,6 +73,9 @@ function Dashboard() {
                     setErrorLogs(data.unresolved_error_logs);
                     setErrorCount(data.unresolved_error_count);
                 }
+                else {                    
+                    console.error('대시보드 데이터 로드 실패:', response.data.message);
+                }
             })
             .catch(error => {
                 console.error('대시보드 데이터 로드 오류:', error);
@@ -80,23 +83,6 @@ function Dashboard() {
             .finally(() => {
                 setIsLoading(false);
             });
-            
-        // mock data for OCR pie chart   
-        setTimeout(() => { 
-            setOcrStats({
-                total_attempts: 1000,
-                success_count: 850,
-                modified_count: 100,
-                failure_count: 50,
-                success_rate: 85
-            });
-            setUserStats({
-                total_users: 150,
-                new_users_7d: 13,
-                new_users_7d_change_rate: 12.3,
-                change_direction: 'UP'
-            });
-        }, 100);
     }, []);
 
     if (isLoading) return <div>로딩 중...</div>;
@@ -204,8 +190,8 @@ function Dashboard() {
                     <table className="dashboard-error-table">
                         <thead>
                             <tr>
-                                <th>발생 일시</th>
-                                <th>에러 유형</th>
+                                <th style={{'width':'12%'}}>발생 일시</th>
+                                <th style={{'width':'100px'}}>에러 유형</th>
                                 <th>에러 메시지</th>
                             </tr>
                         </thead>

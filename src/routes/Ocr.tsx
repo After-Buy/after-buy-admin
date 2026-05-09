@@ -13,6 +13,7 @@ import {
     LabelList,
     Brush
 } from "recharts";
+import axios from "axios";
 
 type OcrSummary = {
     total_attempts: number;
@@ -46,74 +47,78 @@ function Ocr() {
 
     const fetchStats = () => {
         setIsLoading(true);
-        
+
         // 임시 더미 데이터 사용
-        setTimeout(() => {
-            let m = 1;
-            if (period === '3m') m = 3;
-            if (period === '6m') m = 6;
-            if (period === '1y') m = 12;
+        // setTimeout(() => {
+        //     let m = 1;
+        //     if (period === '3m') m = 3;
+        //     if (period === '6m') m = 6;
+        //     if (period === '1y') m = 12;
 
-            setSummary({
-                total_attempts: 100 * m,
-                failure_count: 16 * m,
-                modified_count: 35 * m,
-                failure_rate: 16,
-                modified_rate: 35
-            });
+        //     setSummary({
+        //         total_attempts: 100 * m,
+        //         failure_count: 16 * m,
+        //         modified_count: 35 * m,
+        //         failure_rate: 16,
+        //         modified_rate: 35
+        //     });
 
-            setFieldStats([
-                { field_name: "상품명", modified_count: 12 * m, rate: 11.4 },
-                { field_name: "모델명", modified_count: 25 * m, rate: 23.8 },
-                { field_name: "브랜드", modified_count: 10 * m, rate: 9.5 },
-                { field_name: "구매가격", modified_count: 30 * m, rate: 28.5 },
-                { field_name: "구매처", modified_count: 28 * m, rate: 26.6 },
-            ]);
+        //     setFieldStats([
+        //         { field_name: "상품명", modified_count: 12 * m, rate: 11.4 },
+        //         { field_name: "모델명", modified_count: 25 * m, rate: 23.8 },
+        //         { field_name: "브랜드", modified_count: 10 * m, rate: 9.5 },
+        //         { field_name: "구매가격", modified_count: 30 * m, rate: 28.5 },
+        //         { field_name: "구매처", modified_count: 28 * m, rate: 26.6 },
+        //     ]);
 
-            const trend: DailyTrend[] = [];
-            const now = new Date();
+        //     const trend: DailyTrend[] = [];
+        //     const now = new Date();
 
-            let days = 30;
-            if (period === '3m') days = 90;
-            if (period === '6m') days = 180;
-            if (period === '1y') days = 365;
+        //     let days = 30;
+        //     if (period === '3m') days = 90;
+        //     if (period === '6m') days = 180;
+        //     if (period === '1y') days = 365;
 
-            for (let i = days - 1; i >= 0; i--) {
-                const d = new Date(now);
-                d.setDate(now.getDate() - i);
-                d.setHours(0, 0, 0, 0);
+        //     for (let i = days - 1; i >= 0; i--) {
+        //         const d = new Date(now);
+        //         d.setDate(now.getDate() - i);
+        //         d.setHours(0, 0, 0, 0);
 
-                let base = 50;
-                if (period === '3m') base = 150;
-                if (period === '6m') base = 300;
-                if (period === '1y') base = 600;
+        //         let base = 50;
+        //         if (period === '3m') base = 150;
+        //         if (period === '6m') base = 300;
+        //         if (period === '1y') base = 600;
 
-                trend.push({
-                    date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-                    time: d.getTime(),
-                    failure_count: Math.floor(Math.random() * base) + Math.floor(base * 0.2)
-                });
-            }
-            setDailyTrend(trend);
-            setIsLoading(false);
-        }, 400);
+        //         trend.push({
+        //             date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+        //             time: d.getTime(),
+        //             failure_count: Math.floor(Math.random() * base) + Math.floor(base * 0.2)
+        //         });
+        //     }
+        //     setDailyTrend(trend);
+        //     setIsLoading(false);
+        // }, 400);
 
-        /* 실제 API 호출 시 사용할 코드
+        // 실제 API 호출 시 사용할 코드
         axios.get('/api/admin/ocr-stats', {
             params: { period },
             withCredentials: true
         })
-        .then(res => {
-            if (res.data.success) {
-                const d = res.data.data;
-                setSummary(d.summary);
-                setFieldStats(d.field_modified_stats);
-                setDailyTrend(d.daily_failure_trend);
-            }
-        })
-        .catch(err => console.error(err))
-        .finally(() => setIsLoading(false));
-        */
+            .then(res => {
+                if (res.data.success) {
+                    const d = res.data.data;
+                    setSummary(d.summary);
+                    setFieldStats(d.field_modified_stats);
+                    const trend = d.daily_failure_trend.map((item: DailyTrend) => ({
+                        ...item,
+                        time: new Date(item.date).getTime()
+                    }));
+                    setDailyTrend(trend);
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => setIsLoading(false));
+
     };
 
     useEffect(() => {
