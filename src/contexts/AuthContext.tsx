@@ -19,6 +19,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 앱 로드 시 쿠키 유효성 검사 (check API 호출)
   useEffect(() => {
     const checkAuth = async () => {
+      if (location.pathname === "/login") {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
       try {
         const response = await axios.get('/api/admin/auth/check', {
           withCredentials: true,
