@@ -5,13 +5,12 @@ import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import axios from 'axios'
 
-// Global Axios Interceptor for handling 401 Unauthorized
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      if (localStorage.getItem('isLoggedIn') === 'true') {
-        localStorage.removeItem('isLoggedIn');
+      if (window.location.pathname !== '/login') {
+        alert('세션이 만료되었습니다. 다시 로그인해 주세요.');
         window.location.href = '/login';
       }
     }

@@ -30,6 +30,7 @@ function NoticeDetail() {
     const [editContent, setEditContent] = useState("");
     const [editIsPinned, setEditIsPinned] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const categories = ["ALL", "NOTICE", "MAINTENANCE", "UPDATE"] as const;
     const categoryLabels: Record<typeof categories[number], string> = {
@@ -59,16 +60,16 @@ function NoticeDetail() {
     }, [id]);
 
     const handleDelete = async () => {
-        if (window.confirm('정말 삭제하시겠습니까?')) {
-            try {
-                const res = await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
-                if (res.data.success) {
-                    alert('삭제되었습니다.');
-                    navigate('/notice');
-                }
-            } catch (e) {
-                alert('삭제 중 오류가 발생했습니다.');
+        try {
+            const res = await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
+            if (res.data.success) {
+                alert('삭제되었습니다.');
+                navigate('/notice');
             }
+        } catch (e) {
+            alert('삭제 중 오류가 발생했습니다.');
+        } finally {
+            setIsDeleteModalOpen(false);
         }
     };
 
@@ -215,7 +216,7 @@ function NoticeDetail() {
                         <button className="detail-btn detail-btn-close" onClick={() => navigate(-1)}>
                             닫기
                         </button>
-                        <button className="detail-btn detail-btn-delete" onClick={handleDelete}>
+                        <button className="detail-btn detail-btn-delete" onClick={() => setIsDeleteModalOpen(true)}>
                             삭제
                         </button>
                         <button className="detail-btn detail-btn-edit" onClick={handleEditClick}>
@@ -224,6 +225,33 @@ function NoticeDetail() {
                     </div>
                 </div>
             </div>
+
+            {isDeleteModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <h3 className="modal-title">공지사항 삭제</h3>
+                        <p className="modal-message">
+                            삭제된 글은 복구할 수 없습니다.<br />
+                            정말로 삭제하시겠습니까?
+                        </p>
+                        <div className="modal-actions">
+                            <button className="modal-btn modal-btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>
+                                취소
+                            </button>
+                            <button className="modal-btn modal-btn-delete" onClick={handleDelete}>
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -37,9 +37,16 @@ function Login() {
         setErrorMsg(response.data.message || '로그인에 실패했습니다.');
       }
     } catch (error: unknown) {
-      console.error('Login error:', error);
       if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data && error.response.data.message) {
+        const status = error.response?.status;
+
+        if (status === 400) {
+          setErrorMsg('필수 입력값이 누락되었습니다.');
+        } else if (status === 401) {
+          setErrorMsg('아이디 또는 비밀번호가 일치하지 않습니다.');
+        } else if (status === 423) {
+          setErrorMsg('계정이 잠겼습니다. 관리자에게 문의하세요.');
+        } else if (error.response?.data?.message) {
           setErrorMsg('로그인 실패: ' + error.response.data.message);
         } else {
           setErrorMsg('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
