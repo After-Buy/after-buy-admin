@@ -4,9 +4,6 @@ import { Pin } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 
-// Mock data (for development/testing purposes)
-import { announcements as mockAnnouncements, pinned_announcements as mockPinnedAnnouncements } from "../mocks/announcements";
-
 export type Announcement = {
     announcement_id: number;
     title: string;
@@ -31,9 +28,9 @@ function Notice() {
     const [category, setCategory] = useState<typeof categories[number]>("ALL");
     const [keyword, setKeyword] = useState("");
 
-    const [pinnedAnnouncements, setPinnedAnnouncements] = useState<Announcement[]>(mockPinnedAnnouncements);
-    const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
-    const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: mockPinnedAnnouncements.length + mockAnnouncements.length });
+    const [pinnedAnnouncements, setPinnedAnnouncements] = useState<Announcement[]>([]);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+    const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: 0 });
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -60,9 +57,7 @@ function Notice() {
     };
 
     useEffect(() => {
-        // fetchAnnouncements();
-        setAnnouncements(mockAnnouncements.filter(a => category === "ALL" || a.category === category) as Announcement[]);
-        setPinnedAnnouncements(mockPinnedAnnouncements.filter(a => category === "ALL" || a.category === category) as Announcement[]);
+        fetchAnnouncements();
     }, [category, pagination.current_page]);
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {

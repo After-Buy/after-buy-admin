@@ -21,8 +21,7 @@ function GuideCreate() {
 
         try {
             const res = await axios.post(
-                // 추후에 주소 수정
-                "/api/admin/guides",
+                "/api/admin/faqs",
                 {
                     title: title.trim(),
                     content: content.trim(),
@@ -64,7 +63,7 @@ function GuideCreate() {
                         />
                     </div>
 
-                    
+
                     <div className="detail-form-row">
                         <label htmlFor="detail-content">내용</label>
                         <div className="markarea">

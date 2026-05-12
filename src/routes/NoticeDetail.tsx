@@ -1,11 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-    announcement_details as mockAnnouncementDetails,
-    announcements as mockAnnouncements,
-    pinned_announcements as mockPinnedAnnouncements
-} from "../mocks/announcements";
 import MDEditor from '@uiw/react-md-editor';
 
 export type AnnouncementDetail = {
@@ -35,6 +30,7 @@ function NoticeDetail() {
     const [editContent, setEditContent] = useState("");
     const [editIsPinned, setEditIsPinned] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const categories = ["ALL", "NOTICE", "MAINTENANCE", "UPDATE"] as const;
     const categoryLabels: Record<typeof categories[number], string> = {
@@ -47,45 +43,33 @@ function NoticeDetail() {
         if (!id) return;
         setIsLoading(true);
 
-        // mock data
-        const fallback = () => {
-            const found = mockAnnouncementDetails.find(item => item.announcement_id === Number(id));
-            if (found) {
-                setDetail(found);
-                setErrorMsg('');
-            } else {
-                setDetail(null);
-                setErrorMsg("데이터를 불러올 수 없습니다.");
-            }
-        };
-
         axios.get(`/api/admin/announcements/${id}`, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setDetail(res.data.data);
                     setErrorMsg('');
                 } else {
-                    fallback();
+                    setErrorMsg('데이터를 불러오는 데 실패했습니다.');
                 }
             })
             .catch(err => {
                 console.error("공지사항 상세 로드 오류", err);
-                fallback();
+                setErrorMsg('데이터를 불러오는 데 실패했습니다.');
             })
             .finally(() => setIsLoading(false));
     }, [id]);
 
     const handleDelete = async () => {
-        if (window.confirm('정말 삭제하시겠습니까?')) {
-            try {
-                const res = await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
-                if (res.data.success) {
-                    alert('삭제되었습니다.');
-                    navigate('/notice');
-                }
-            } catch (e) {
-                alert('삭제 중 오류가 발생했습니다.');
+        try {
+            const res = await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
+            if (res.data.success) {
+                alert('삭제되었습니다.');
+                navigate('/notice');
             }
+        } catch (e) {
+            alert('삭제 중 오류가 발생했습니다.');
+        } finally {
+            setIsDeleteModalOpen(false);
         }
     };
 
@@ -109,80 +93,32 @@ function NoticeDetail() {
 
         setIsSubmitting(true);
 
-        const updateMockData = () => {
-            const numId = Number(id);
-            const index = mockAnnouncementDetails.findIndex(item => item.announcement_id === numId);
-            if (index !== -1) {
-                mockAnnouncementDetails[index] = {
-                    ...mockAnnouncementDetails[index],
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0,
-                    updated_at: new Date().toISOString()
-                };
-            }
-            
-            let foundItem: any = null;
-            const lIndex = mockAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (lIndex !== -1) {
-                foundItem = { ...mockAnnouncements[lIndex] };
-                mockAnnouncements.splice(lIndex, 1);
-            }
-            
-            const pIndex = mockPinnedAnnouncements.findIndex(item => item.announcement_id === numId);
-            if (pIndex !== -1) {
-                if (!foundItem) foundItem = { ...mockPinnedAnnouncements[pIndex] };
-                mockPinnedAnnouncements.splice(pIndex, 1);
-            }
-            
-            if (foundItem) {
-                foundItem.title = editTitle.trim();
-                foundItem.category = editCategory;
-                foundItem.is_pinned = editIsPinned ? 1 : 0;
-                
-                if (editIsPinned) {
-                    mockPinnedAnnouncements.push(foundItem);
-                } else {
-                    mockAnnouncements.push(foundItem);
-                }
-            }
-            
-            setDetail({
-                ...detail!,
+    
+        await axios.put(
+            `/api/admin/announcements/${id}`,
+            {
                 title: editTitle.trim(),
                 category: editCategory,
                 content: editContent.trim(),
-                is_pinned: editIsPinned ? 1 : 0,
-                updated_at: new Date().toISOString()
-            });
-            alert("수정사항이 반영되었습니다.");
-            setIsEditing(false);
-        };
-
-        try {
-            const res = await axios.put(
-                `/api/admin/announcements/${id}`,
-                {
-                    title: editTitle.trim(),
-                    category: editCategory,
-                    content: editContent.trim(),
-                    is_pinned: editIsPinned ? 1 : 0
-                },
-                { withCredentials: true }
-            );
-
-            if (res.data.success) {
-                updateMockData();
-            } else {
-                updateMockData(); // fallback
-            }
-        } catch (error) {
-            console.error("공지 수정 오류", error);
-            updateMockData(); // fallback
-        } finally {
-            setIsSubmitting(false);
-        }
+                isPinned: editIsPinned ? 1 : 0
+            },
+            { withCredentials: true }
+            ).then(res => {
+                if (res.data.success) {
+                    setDetail(prev => prev ? {
+                        ...prev,
+                        title: editTitle.trim(),
+                        category: editCategory,
+                        content: editContent.trim(),
+                        isPinned: editIsPinned ? 1 : 0
+                    } : prev);
+                    alert("수정사항이 반영되었습니다.");
+                    setIsEditing(false);
+                    navigate('/notice/' + id);}
+            }).catch(error => {
+                console.error("공지 수정 오류", error);
+                alert("수정 중 오류가 발생했습니다.");
+            })
     };
 
     if (isLoading) return <div style={{ padding: '50px', textAlign: 'center' }}>로딩 중...</div>;
@@ -280,7 +216,7 @@ function NoticeDetail() {
                         <button className="detail-btn detail-btn-close" onClick={() => navigate(-1)}>
                             닫기
                         </button>
-                        <button className="detail-btn detail-btn-delete" onClick={handleDelete}>
+                        <button className="detail-btn detail-btn-delete" onClick={() => setIsDeleteModalOpen(true)}>
                             삭제
                         </button>
                         <button className="detail-btn detail-btn-edit" onClick={handleEditClick}>
@@ -289,6 +225,33 @@ function NoticeDetail() {
                     </div>
                 </div>
             </div>
+
+            {isDeleteModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <h3 className="modal-title">공지사항 삭제</h3>
+                        <p className="modal-message">
+                            삭제된 글은 복구할 수 없습니다.<br />
+                            정말로 삭제하시겠습니까?
+                        </p>
+                        <div className="modal-actions">
+                            <button className="modal-btn modal-btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>
+                                취소
+                            </button>
+                            <button className="modal-btn modal-btn-delete" onClick={handleDelete}>
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

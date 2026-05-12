@@ -3,13 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import MDEditor from '@uiw/react-md-editor';
 
-export type AnnouncementDetail = {
-    announcement_id: number;
+type GuideDetail = {
+    faq_id: number;
     title: string;
-    category: string;
     content: string;
-    is_pinned: number;
-    is_new: boolean;
     created_by: number;
     created_at: string;
     updated_at: string;
@@ -18,22 +15,20 @@ export type AnnouncementDetail = {
 function GuideDetail() {
     const navigate = useNavigate();
     const { id } = useParams();
-    const [detail, setDetail] = useState<AnnouncementDetail | null>(null);
+    const [detail, setDetail] = useState<GuideDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
 
-    // Edit state
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState("");
-    const [editCategory, setEditCategory] = useState<"NOTICE" | "MAINTENANCE" | "UPDATE">("NOTICE");
     const [editContent, setEditContent] = useState("");
-    const [editIsPinned, setEditIsPinned] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
         setIsLoading(true);
-        axios.get(`/api/admin/announcements/${id}`, { withCredentials: true })
+        axios.get(`/api/admin/faqs/${id}`, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setDetail(res.data.data);
@@ -42,23 +37,23 @@ function GuideDetail() {
                 }
             })
             .catch(err => {
-                console.error("공지사항 상세 로드 오류", err);
-                setErrorMsg("공지사항을 찾을 수 없습니다.");
+                console.error("이용안내 상세 로드 오류", err);
+                setErrorMsg("이용안내를 찾을 수 없습니다.");
             })
             .finally(() => setIsLoading(false));
     }, [id]);
 
     const handleDelete = async () => {
-        if (window.confirm('정말 삭제하시겠습니까?')) {
-            try {
-                const res = await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
-                if (res.data.success) {
-                    alert('삭제되었습니다.');
-                    navigate('/notice');
-                }
-            } catch (e) {
-                alert('삭제 중 오류가 발생했습니다.');
+        try {
+            const res = await axios.delete(`/api/admin/faqs/${id}`, { withCredentials: true });
+            if (res.data.success) {
+                alert('삭제되었습니다.');
+                navigate('/guide');
             }
+        } catch (e) {
+            alert('삭제 중 오류가 발생했습니다.');
+        } finally {
+            setIsDeleteModalOpen(false);
         }
     };
 
@@ -66,7 +61,6 @@ function GuideDetail() {
         if (detail) {
             setEditTitle(detail.title);
             setEditContent(detail.content);
-            setEditIsPinned(detail.is_pinned === 1);
             setIsEditing(true);
         }
     };
@@ -78,8 +72,28 @@ function GuideDetail() {
             alert("제목과 내용을 입력해 주세요.");
             return;
         }
-
         setIsSubmitting(true);
+        axios.put(`/api/admin/faqs/${id}`,
+            {
+                title: editTitle.trim(),
+                content: editContent.trim()
+            },
+            { withCredentials: true }
+        ).then(res => {
+            if (res.data.success) {
+                setDetail(prev => prev ? {
+                    ...prev,
+                    title: editTitle.trim(),
+                    content: editContent.trim(),
+                } : prev);
+                alert("이용 안내가 수정되었습니다.");
+                setIsEditing(false);
+                navigate('/guide/' + id);
+            } else {
+                alert("이용 안내 수정에 실패했습니다.");
+            }
+            setIsSubmitting(false);
+        });
     };
 
     if (isLoading) return <div style={{ padding: '50px', textAlign: 'center' }}>로딩 중...</div>;
@@ -87,36 +101,12 @@ function GuideDetail() {
 
     if (isEditing) {
         return (
-            <div className="notice-page">
-                <h2 style={{ cursor: "pointer", display: "inline-block" }} onClick={() => navigate("/notice")}>
-                    공지사항
+            <div>
+                <h2 style={{ cursor: "pointer", display: "inline-block" }} onClick={() => navigate("/guide")}>
+                    이용 안내
                 </h2>
                 <div className="container">
                     <form className="detail-form-card" onSubmit={handleEditSubmit}>
-                        <div className="detail-form-grid">
-                            <div className="detail-form-row">
-                                <label htmlFor="detail-category">카테고리</label>
-                                <select
-                                    id="notice-category"
-                                    className="detail-form-input"
-                                    value={editCategory}
-                                    onChange={(e) => setEditCategory(e.target.value as "NOTICE" | "MAINTENANCE" | "UPDATE")}
-                                >
-                                    <option value="NOTICE">안내</option>
-                                    <option value="MAINTENANCE">점검</option>
-                                    <option value="UPDATE">업데이트</option>
-                                </select>
-                            </div>
-
-                            <label className="detail-form-check">
-                                <input
-                                    type="checkbox"
-                                    checked={editIsPinned}
-                                    onChange={(e) => setEditIsPinned(e.target.checked)}
-                                />
-                                상단 고정
-                            </label>
-                        </div>
 
                         <div className="detail-form-row">
                             <label htmlFor="detail-title">제목</label>
@@ -128,7 +118,7 @@ function GuideDetail() {
                                 placeholder="공지 제목을 입력해 주세요"
                             />
                         </div>
-                        
+
                         <div className="detail-form-row">
                             <label htmlFor="detail-content">내용</label>
                             <div className="markarea">
@@ -154,13 +144,12 @@ function GuideDetail() {
 
     return (
         <div className="guide-page">
-            <h2 style={{ cursor: 'pointer', display: 'inline-block' }} onClick={() => navigate('/notice')}>공지사항</h2>
+            <h2 style={{ cursor: 'pointer', display: 'inline-block' }} onClick={() => navigate('/guide')}>이용 안내</h2>
 
             <div className="container">
                 <div className="detail-card">
                     <div className="detail-header">
                         <h3>
-                            <span style={{ color: '#888', marginRight: '8px', fontSize: '18px' }}>[{detail.category}]</span>
                             {detail.title}
                         </h3>
                         <div className="detail-meta">
@@ -174,10 +163,10 @@ function GuideDetail() {
                     </div>
 
                     <div className="detail-actions">
-                        <button className="detail-btn notice-detail-btn-close" onClick={() => navigate(-1)}>
+                        <button className="detail-btn detail-btn-close" onClick={() => navigate(-1)}>
                             닫기
                         </button>
-                        <button className="detail-btn detail-btn-delete" onClick={handleDelete}>
+                        <button className="detail-btn detail-btn-delete" onClick={() => setIsDeleteModalOpen(true)}>
                             삭제
                         </button>
                         <button className="detail-btn detail-btn-edit" onClick={handleEditClick}>
@@ -186,6 +175,33 @@ function GuideDetail() {
                     </div>
                 </div>
             </div>
+
+            {isDeleteModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <h3 className="modal-title">이용 안내 삭제</h3>
+                        <p className="modal-message">
+                            삭제된 글은 복구할 수 없습니다.<br />
+                            정말로 삭제하시겠습니까?
+                        </p>
+                        <div className="modal-actions">
+                            <button className="modal-btn modal-btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>
+                                취소
+                            </button>
+                            <button className="modal-btn modal-btn-delete" onClick={handleDelete}>
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

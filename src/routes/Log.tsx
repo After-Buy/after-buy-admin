@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 type LoginLog = {
     log_id: number;
@@ -12,6 +13,7 @@ type LoginLog = {
 };
 
 function Log() {
+    const navigate = useNavigate();
     const [loginLogs, setLoginLogs] = useState<LoginLog[]>([]);
     const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1, total_count: 0 });
     const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +65,7 @@ function Log() {
                                     </tr>
                                 )}
                                 {loginLogs.map(log => (
-                                    <tr key={log.log_id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}>
+                                    <tr key={log.log_id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }} onClick={() => navigate(`/log/${log.log_id}`)}>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>{log.log_id}</td>
                                         <td style={{ padding: '16px', textAlign: 'center', fontWeight: '500' }}>{log.admin_account}</td>
                                         <td style={{ padding: '16px', textAlign: 'center', color: '#6b7280' }}>{new Date(log.login_at).toLocaleString()}</td>

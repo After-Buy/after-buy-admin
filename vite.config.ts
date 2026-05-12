@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/admin': {
-        target: 'http://127.0.0.1:8084',
+        target: 'https://dev.after-buy.r-e.kr',
         changeOrigin: true,
       }
     }

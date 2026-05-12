@@ -21,15 +21,15 @@ function NoticeCreate() {
 
         setIsSubmitting(true);
 
-        console.log({ title, category, content, is_pinned: isPinned ? 1 : 0 });
+        console.log({ title, category, content, isPinned: isPinned ? 1 : 0 });
         try {
             const res = await axios.post(
                 "/api/admin/announcements",
                 {
                     title: title.trim(),
-                    category,
+                    category: category,
                     content: content.trim(),
-                    is_pinned: isPinned ? 1 : 0
+                    isPinned: isPinned ? 1 : 0
                 },
                 { withCredentials: true }
             );

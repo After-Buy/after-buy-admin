@@ -1,0 +1,15 @@
+{
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://dev.after-buy.r-e.kr/api/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
