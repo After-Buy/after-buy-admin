@@ -79,7 +79,7 @@ function ErrorLogs() {
                     </select>
                 </div>
 
-                <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="card" style={{ overflow: 'hidden' }}>
                     {isLoading ? <div style={{ padding: '50px', textAlign: 'center', color: '#777' }}>로딩 중...</div> : (
                         <table className="dashboard-error-table" style={{ width: '100%', margin: '0', borderCollapse: 'collapse' }}>
                             <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
