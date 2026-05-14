@@ -46,7 +46,7 @@ function Log() {
             <h2>관리자 접속 내역</h2>
 
             <div className="container" style={{ marginTop: '30px' }}>
-                <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="card error" style={{ overflow: 'hidden' }}>
                     {isLoading ? <div style={{ padding: '50px', textAlign: 'center', color: '#777' }}>로딩 중...</div> : (
                         <table style={{ width: '100%', margin: '0', borderCollapse: 'collapse' }}>
                             <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>

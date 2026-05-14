@@ -115,7 +115,7 @@ function Notice() {
                                 )}
 
                                 {pinnedAnnouncements.map((item) => (
-                                    <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)} style={{ cursor: 'pointer', borderBottom: '1px solid #e3e7ee' }}>
+                                    <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)}>
                                         <td style={{ textAlign: 'center' }}><Pin size={16} color="#43ABE5" style={{ display: 'inline' }} /></td>
                                         <td className="notice-title" style={{ fontWeight: 'bold', color: '#1f2937' }}>
                                             <span style={{color:'gray'}}>[{categoryLabels[item.category]}]</span> {item.title}
@@ -127,7 +127,7 @@ function Notice() {
                                 ))}
 
                                 {announcements.map((item) => (
-                                    <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)} style={{ cursor: 'pointer', borderBottom: '1px solid #e3e7ee' }}>
+                                    <tr key={item.announcement_id} className="notice-row" onClick={() => navigate(`/notice/${item.announcement_id}`)} >
                                         <td style={{ textAlign: 'center' }}>{item.announcement_id}</td>
                                         <td className="notice-title" style={{ color: '#374151' }}>
                                             <span style={{color:'gray'}}>[{categoryLabels[item.category]}]</span> {item.title}

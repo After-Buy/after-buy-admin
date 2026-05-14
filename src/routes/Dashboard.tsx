@@ -175,7 +175,7 @@ function Dashboard() {
                                 <li key={item.announcement_id}>
                                     <Link to={`/notice/${item.announcement_id}`}>
                                         <span style={{ fontWeight: '500' }}>
-                                            <span style={{ color: '#888', marginRight: '5px' }}>[{categoryLabels[item.category]}]</span>
+                                            <span style={{ color: '#888' }}>[{categoryLabels[item.category]}]</span>
                                             {item.title}
                                         </span>
                                         <span className="notice-date">{new Date(item.created_at).toLocaleDateString()}</span>

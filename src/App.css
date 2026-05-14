@@ -389,7 +389,8 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     color: inherit;
-
+    cursor: pointer;
+    border-bottom: 1px solid #e3e7ee;
 
     svg {
       align-self: center;
@@ -458,6 +459,8 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     color: inherit;
+    cursor: pointer;
+    border-bottom: 1px solid #e3e7ee;
 
 
     svg {
@@ -532,7 +535,8 @@ a {
 }
 
 .detail-body {
-  height: 300px;
+  height: auto;
+  min-height: 500px;
   margin-top: 20px;
   line-height: 1.7;
   color: #374151;
