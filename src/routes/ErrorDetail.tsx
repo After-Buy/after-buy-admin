@@ -4,6 +4,7 @@ import axios from "axios";
 
 export type ErrorLogDetail = {
     log_id: number;
+    service_name: string;
     error_type: string;
     error_message: string;
     full_message: string;
@@ -173,6 +174,12 @@ function ErrorDetail() {
                         </div>
                     </div>
 
+                    <div style={{ marginBottom: '20px' }}>
+                        <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#374151' }}>서비스 이름</h4>
+                        <div style={{ padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6', color: '#111827', fontWeight: '500' }}>
+                            {detail.service_name}
+                        </div>
+                    </div>
                     <div style={{ marginBottom: '20px' }}>
                         <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#374151' }}>에러 메시지</h4>
                         <div style={{ padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6', color: '#111827', fontWeight: '500' }}>
