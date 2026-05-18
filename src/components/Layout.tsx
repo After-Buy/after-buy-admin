@@ -27,7 +27,7 @@ function Layout() {
             <div className="sidebar">
                 <aside>
                     <nav>
-                        <h3 onClick={()=>{navigate('/')}}>After-Buy</h3>
+                        <h3 style={{ cursor: "pointer" }} onClick={()=>{navigate('/')}}>After-Buy</h3>
                         <CircleUserRound size={40} style={{alignSelf: "center"}}/>
                         {adminAccount && <p style={{textAlign: "center", fontWeight: "bold"}}>{adminAccount}</p>}
                         <ul>
