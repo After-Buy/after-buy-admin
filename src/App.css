@@ -265,7 +265,7 @@ a {
   color: #999;
   font-size: 13px;
   min-width: 100px;
-  text-align: right;
+  text-align: left;
 }
 
 .dashboard-error-table {
