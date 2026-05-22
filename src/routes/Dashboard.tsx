@@ -60,7 +60,7 @@ function Dashboard() {
     );
 
     const renderOcrPieLabel = ({ name, value, percent, x, y }: any) => {
-        if (!value || percent < 0.05) return null;
+        if (!value || percent <= 0) return null;
 
         return (
             <text x={x} y={y} fill="#4b5563" fontSize={12} textAnchor="middle" dominantBaseline="central">
