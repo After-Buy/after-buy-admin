@@ -3,8 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import {
   PieChart, Pie, Tooltip, 
-  Sector,
-  LabelList
+  Sector
 } from 'recharts';
 
 
@@ -59,6 +58,16 @@ function Dashboard() {
     const customSector = (props: any) => (
         <Sector {...props} fill={colors[props.index % colors.length]} />
     );
+
+    const renderOcrPieLabel = ({ name, value, percent, x, y }: any) => {
+        if (!value || percent < 0.05) return null;
+
+        return (
+            <text x={x} y={y} fill="#4b5563" fontSize={12} textAnchor="middle" dominantBaseline="central">
+                {name}
+            </text>
+        );
+    };
 
 
 
@@ -131,9 +140,9 @@ function Dashboard() {
                                         cy="50%"
                                         outerRadius="75%"
                                         shape={customSector}
-                                    >
-                                        <LabelList dataKey="name" position="outside" />
-                                    </Pie>
+                                        label={renderOcrPieLabel}
+                                        labelLine={false}
+                                    />
                                     <Tooltip />
                                 </PieChart>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', marginTop: '20px' }}>
