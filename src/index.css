@@ -29,26 +29,18 @@
     font-size: 16px;
   }
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #121212;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-} */
+@font-face {
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-display: swap;
+}
 
 #root {
   max-width: 100%;
@@ -62,12 +54,13 @@
 
 body {
   margin: 0;
+  font-family: "Paperozi", var(--sans);
 }
 
 h1,
 h2 {
-  font-family: var(--heading);
-  font-weight: 500;
+  width: fit-content;
+  white-space: nowrap;
   color: var(--text-h);
 }
 
@@ -101,10 +94,6 @@ ul {
   padding: 0;
   margin: 20px 0;
 }
-
-/* li{
-  list-style: none;
-} */
 
 code:not(.markarea *),
 .counter {
