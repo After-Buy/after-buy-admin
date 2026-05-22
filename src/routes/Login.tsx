@@ -31,7 +31,7 @@ function Login() {
       });
  
       if (response.data.success) {
-        login();
+        login(response.data.data?.admin_account ?? adminAccount);
         navigate('/');
       } else {
         setErrorMsg(response.data.message || '로그인에 실패했습니다.');
