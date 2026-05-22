@@ -5,7 +5,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   adminAccount?: string;
-  login: () => void;
+  login: (adminAccount?: string) => void;
   logout: () => void;
 }
 
@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('인증 상태 확인 실패:', error);
         setIsAuthenticated(false);
+        setAdminAccount(undefined);
       } finally {
         setIsLoading(false);
       }
@@ -47,7 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = () => setIsAuthenticated(true);
+  const login = (adminAccount?: string) => {
+    setIsAuthenticated(true);
+    setAdminAccount(adminAccount);
+  };
   const logout = () => {
     setIsAuthenticated(false);
     setAdminAccount(undefined);
