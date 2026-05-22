@@ -89,7 +89,7 @@ function Dashboard() {
 
     return (
         <>
-            <h2>대시보드</h2>
+            <h2>주간 대시보드</h2>
             <div className="container">
                 <div className="row">
                     <div className="card stats">
@@ -167,10 +167,10 @@ function Dashboard() {
                             <div style={{ marginTop: '20px', textAlign: 'center', color: '#999' }}>데이터 없음</div>
                         )}
                     </div>
-                    <div className="card">
+                    <div className="card notice">
                         <h5>공지사항</h5>
                         <ul className="dashboard-notice-list">
-                            {announcements?.length === 0 && <li style={{ padding: '20px', color: '#aaa', justifyContent: 'center' }}>최근 등록된 공지가 없습니다.</li>}
+                            {announcements?.length === 0 && <li className="none">최근 등록된 공지가 없습니다.</li>}
                             {announcements?.map((item) => (
                                 <li key={item.announcement_id}>
                                     <Link to={`/notice/${item.announcement_id}`}>
@@ -190,7 +190,7 @@ function Dashboard() {
                     <table className="dashboard-error-table">
                         <thead>
                             <tr>
-                                <th style={{'width':'12%'}}>발생 일시</th>
+                                <th style={{'width':'12%', 'minWidth': '140px'}}>발생 일시</th>
                                 <th style={{'width':'100px'}}>에러 유형</th>
                                 <th>에러 메시지</th>
                             </tr>
@@ -205,13 +205,9 @@ function Dashboard() {
                                 <tr key={log.log_id}>
                                     <td>{new Date(log.created_at).toLocaleString()}</td>
                                     <td>
-                                        <span style={{
+                                        <span className="error-type" style={{
                                             color: log.error_type === 'ERROR' ? '#ef4444' : '#f5a623',
-                                            fontWeight: 'bold',
-                                            padding: '4px 8px',
                                             backgroundColor: log.error_type === 'ERROR' ? '#fee2e2' : '#fef3c7',
-                                            borderRadius: '4px',
-                                            fontSize: '12px'
                                         }}>{log.error_type}</span>
                                     </td>
                                     <td>{log.error_message}</td>

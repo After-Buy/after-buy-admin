@@ -29,7 +29,7 @@ function Layout() {
                     <nav>
                         <h3 style={{ cursor: "pointer" }} onClick={()=>{navigate('/')}}>After-Buy</h3>
                         <CircleUserRound size={40} style={{alignSelf: "center"}}/>
-                        {adminAccount && <p style={{textAlign: "center", fontWeight: "bold"}}>{adminAccount}</p>}
+                        {adminAccount && <p style={{textAlign: "center"}}>{adminAccount}</p>}
                         <ul>
                             <li className={`${location.pathname === "/" ? "active" : ""}`}>
                             <Link to="/"><LayoutDashboard size={18} />대시보드</Link></li>
