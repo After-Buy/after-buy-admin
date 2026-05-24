@@ -70,8 +70,14 @@ type OcrStatsResponse = {
     daily_result_trend: DailyResultTrendResponse[];
 };
 
-const MODIFIED_PIE_COLORS = ['#7c3aed', '#2563eb', '#059669', '#f59e0b', '#dc2626', '#0891b2', '#9333ea'];
-const FAILURE_PIE_COLORS = ['#dc2626', '#f97316', '#d97706', '#be123c', '#9333ea', '#2563eb', '#475569'];
+type PieStatItem = {
+    name: string;
+    value: number;
+    rate: number;
+};
+
+const MODIFIED_PIE_COLORS = ['#fff018', '#2563eb', '#059669', '#f59e0b', '#dc2626', '#0891b2', '#9333ea'];
+const FAILURE_PIE_COLORS = ['#dc2626', '#f97316', '#008006', '#be123c', '#9333ea', '#2563eb', '#475569'];
 
 const toSafeNumber = (value: unknown) => {
     const numberValue = Number(value ?? 0);
@@ -84,12 +90,12 @@ const formatKoreanDate = (value: string | number) => {
     return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-const renderPieLabel = ({ name, value, percent, x, y }: any) => {
-    if (!value || percent <= 0) return null;
+const renderPieLabel = ({ value, percent, x, y }: any) => {
+    if (!value || percent <= 0.03) return null;
 
     return (
         <text x={x} y={y} fill="#4b5563" fontSize={12} textAnchor="middle" dominantBaseline="central">
-            {name} {((percent ?? 0) * 100).toFixed(1)}%
+            {((percent ?? 0) * 100).toFixed(1)}%
         </text>
     );
 };
@@ -104,6 +110,21 @@ function EmptyChart() {
     return (
         <div style={{ height: '100%', minHeight: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#777' }}>
             표시할 데이터가 없습니다
+        </div>
+    );
+}
+
+function PieStatList({ data, colors }: { data: PieStatItem[]; colors: string[] }) {
+    return (
+        <div className="ocr-pie-list">
+            {data.map((item, index) => (
+                <div className="ocr-pie-list-item" key={item.name}>
+                    <span className="ocr-pie-list-dot" style={{ backgroundColor: colors[index % colors.length] }} />
+                    <span className="ocr-pie-list-name" title={item.name}>{item.name}</span>
+                    <span className="ocr-pie-list-value">{item.value.toLocaleString()}건</span>
+                    <span className="ocr-pie-list-rate">{item.rate.toFixed(1)}%</span>
+                </div>
+            ))}
         </div>
     );
 }
@@ -270,9 +291,9 @@ function Ocr() {
                                 })}
                             </div>
 
-                            <div className="row" style={{ marginTop: '50px' }}>
-                                <div style={{ flex: 1 }}>
-                                    <h5 style={{ textAlign: 'center', margin: '0 50px 0px 20px', color: '#374151', fontWeight: 'bold' }}>성공률 그래프</h5>
+                            <div className="row" style={{ marginTop: '50px', marginBottom: '20px' }}>
+                                <div className="ocr-line-chart" style={{ flex: 1 }}>
+                                    <h5>성공률 그래프</h5>
                                     <div style={{ width: '100%', height: 350 }}>
                                         {hasDailyTrend ? (
                                             <ResponsiveContainer>
@@ -321,63 +342,71 @@ function Ocr() {
                             </div>
                             <div className="row" style={{ width: '100%' }}>
                                 <div style={{ flex: 1 }}>
-                                    <h5 style={{ textAlign: 'center', marginBottom: '20px', color: '#374151', fontWeight: 'bold' }}>항목별 오인식 건수</h5>
-                                    <div style={{ width: '100%', height: 400 }}>
+                                    <h5 className="ocr-pie-chart">항목별 오인식 건수</h5>
+                                    <div className="ocr-pie-layout">
                                         {hasFieldModifiedStats ? (
-                                            <ResponsiveContainer>
-                                                <PieChart>
-                                                    <Pie
-                                                        data={fieldModifiedPieData}
-                                                        dataKey="value"
-                                                        nameKey="name"
-                                                        cx="50%"
-                                                        cy="50%"
-                                                        outerRadius={115}
-                                                        labelLine={false}
-                                                        label={renderPieLabel}
-                                                    >
-                                                        {fieldModifiedPieData.map((entry, index) => (
-                                                            <Cell key={entry.name} fill={MODIFIED_PIE_COLORS[index % MODIFIED_PIE_COLORS.length]} />
-                                                        ))}
-                                                    </Pie>
-                                                    <Tooltip
-                                                        formatter={(value: any, name: any) => [`${toSafeNumber(value).toLocaleString()}건`, name]}
-                                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                                    />
-                                                    <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
-                                                </PieChart>
-                                            </ResponsiveContainer>
+                                            <>
+                                                <div className="ocr-pie-canvas">
+                                                    <ResponsiveContainer>
+                                                        <PieChart>
+                                                            <Pie
+                                                                data={fieldModifiedPieData}
+                                                                dataKey="value"
+                                                                nameKey="name"
+                                                                cx="50%"
+                                                                cy="50%"
+                                                                outerRadius={95}
+                                                                labelLine={false}
+                                                                label={renderPieLabel}
+                                                            >
+                                                                {fieldModifiedPieData.map((entry, index) => (
+                                                                    <Cell key={entry.name} fill={MODIFIED_PIE_COLORS[index % MODIFIED_PIE_COLORS.length]} />
+                                                                ))}
+                                                            </Pie>
+                                                            <Tooltip
+                                                                formatter={(value: any, name: any) => [`${toSafeNumber(value).toLocaleString()}건`, name]}
+                                                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                            />
+                                                        </PieChart>
+                                                    </ResponsiveContainer>
+                                                </div>
+                                                <PieStatList data={fieldModifiedPieData} colors={MODIFIED_PIE_COLORS} />
+                                            </>
                                         ) : <EmptyChart />}
                                     </div>
                                 </div>
 
                                 <div style={{ flex: 1 }}>
-                                    <h5 style={{ textAlign: 'center', marginBottom: '20px', color: '#374151', fontWeight: 'bold' }}>항목별 실패 건수</h5>
-                                    <div style={{ width: '100%', height: 400 }}>
+                                    <h5 className="ocr-pie-chart">항목별 실패 건수</h5>
+                                    <div className="ocr-pie-layout">
                                         {hasFieldFailureStats ? (
-                                            <ResponsiveContainer>
-                                                <PieChart>
-                                                    <Pie
-                                                        data={fieldFailurePieData}
-                                                        dataKey="value"
-                                                        nameKey="name"
-                                                        cx="50%"
-                                                        cy="50%"
-                                                        outerRadius={115}
-                                                        labelLine={false}
-                                                        label={renderPieLabel}
-                                                    >
-                                                        {fieldFailurePieData.map((entry, index) => (
-                                                            <Cell key={entry.name} fill={FAILURE_PIE_COLORS[index % FAILURE_PIE_COLORS.length]} />
-                                                        ))}
-                                                    </Pie>
-                                                    <Tooltip
-                                                        formatter={(value: any, name: any) => [`${toSafeNumber(value).toLocaleString()}건`, name]}
-                                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                                    />
-                                                    <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
-                                                </PieChart>
-                                            </ResponsiveContainer>
+                                            <>
+                                                <div className="ocr-pie-canvas">
+                                                    <ResponsiveContainer>
+                                                        <PieChart>
+                                                            <Pie
+                                                                data={fieldFailurePieData}
+                                                                dataKey="value"
+                                                                nameKey="name"
+                                                                cx="50%"
+                                                                cy="50%"
+                                                                outerRadius={95}
+                                                                labelLine={false}
+                                                                label={renderPieLabel}
+                                                            >
+                                                                {fieldFailurePieData.map((entry, index) => (
+                                                                    <Cell key={entry.name} fill={FAILURE_PIE_COLORS[index % FAILURE_PIE_COLORS.length]} />
+                                                                ))}
+                                                            </Pie>
+                                                            <Tooltip
+                                                                formatter={(value: any, name: any) => [`${toSafeNumber(value).toLocaleString()}건`, name]}
+                                                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                            />
+                                                        </PieChart>
+                                                    </ResponsiveContainer>
+                                                </div>
+                                                <PieStatList data={fieldFailurePieData} colors={FAILURE_PIE_COLORS} />
+                                            </>
                                         ) : <EmptyChart />}
                                     </div>
                                 </div>
