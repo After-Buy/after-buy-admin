@@ -788,9 +788,10 @@ a {
   width: 100%;
   min-height: 400px;
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 240px);
+  grid-template-columns: minmax(220px, 300px) minmax(180px, 240px);
+  justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: 8px;
 }
 
 .ocr-pie-canvas {

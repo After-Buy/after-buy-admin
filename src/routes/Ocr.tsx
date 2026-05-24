@@ -76,7 +76,7 @@ type PieStatItem = {
     rate: number;
 };
 
-const MODIFIED_PIE_COLORS = ['#fff018', '#2563eb', '#059669', '#f59e0b', '#dc2626', '#0891b2', '#9333ea'];
+const MODIFIED_PIE_COLORS = ['#7c3aed', '#2563eb', '#059669', '#f59e0b', '#dc2626', '#0891b2', '#9333ea'];
 const FAILURE_PIE_COLORS = ['#dc2626', '#f97316', '#008006', '#be123c', '#9333ea', '#2563eb', '#475569'];
 
 const toSafeNumber = (value: unknown) => {
