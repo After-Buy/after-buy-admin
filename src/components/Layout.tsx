@@ -42,7 +42,7 @@ function Layout() {
                             <li className={`${location.pathname === "/log" ? "active" : ""}`}>
                             <Link to="/log"><ClipboardList size={18} />로그인 내역</Link></li>
                             <li className={`${location.pathname === "/ocr" ? "active" : ""}`}>
-                            <Link to="/ocr"><ScanLine size={18} />OCR 오인식</Link></li>
+                            <Link to="/ocr"><ScanLine size={18} />OCR 통계</Link></li>
                         </ul>
                         <ul className="logout">
                             <button onClick={handleLogout}><LogOut size={18} />로그아웃</button>
