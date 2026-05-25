@@ -251,7 +251,7 @@ function Ocr() {
 
     return (
         <div className="ocr-page">
-            <h2>OCR 오인식</h2>
+            <h2>OCR 통계</h2>
             <div className="container">
                 {isLoading ? <div style={{ padding: '50px', textAlign: 'center', color: '#777' }}>로딩 중...</div> : (
                     <>
