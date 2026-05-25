@@ -180,25 +180,32 @@ function Ocr() {
     const hasFieldFailureStats = fieldFailurePieData.some(item => item.value > 0);
     const hasDailyTrend = dailyTrend.length > 0;
 
-    const mapDailyResultTrend = (items: DailyResultTrendResponse[]) => items.map((item) => {
-        const failureCount = toSafeNumber(item.failure_count);
-        const modifiedCount = toSafeNumber(item.modified_count);
-        const totalAttempts = toSafeNumber(item.total_attempts);
-        const successCount = toSafeNumber(item.success_count);
-        const calculatedSuccessRate = getSuccessRate(successCount, totalAttempts);
+    const mapDailyResultTrend = (items: DailyResultTrendResponse[]) => {
+        let cumulativeTotalAttempts = 0;
+        let cumulativeSuccessCount = 0;
 
-        return {
-            date: item.date,
-            time: new Date(item.date).getTime(),
-            total_attempts: totalAttempts,
-            success_count: successCount,
-            failure_count: failureCount,
-            modified_count: modifiedCount,
-            success_rate: item.success_rate !== undefined
-                ? toSafeNumber(item.success_rate)
-                : calculatedSuccessRate
-        };
-    });
+        return [...items]
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .map((item) => {
+                const totalAttempts = toSafeNumber(item.total_attempts);
+                const successCount = toSafeNumber(item.success_count);
+                const failureCount = toSafeNumber(item.failure_count);
+                const modifiedCount = toSafeNumber(item.modified_count);
+
+                cumulativeTotalAttempts += totalAttempts;
+                cumulativeSuccessCount += successCount;
+
+                return {
+                    date: item.date,
+                    time: new Date(item.date).getTime(),
+                    total_attempts: totalAttempts,
+                    success_count: successCount,
+                    failure_count: failureCount,
+                    modified_count: modifiedCount,
+                    success_rate: getSuccessRate(cumulativeSuccessCount, cumulativeTotalAttempts)
+                };
+            });
+    };
 
     const fetchSummary = () => {
         axios.get('/api/admin/ocr-stats', {
