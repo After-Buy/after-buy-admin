@@ -211,15 +211,15 @@ function Dashboard() {
                                 </tr>
                             )}
                             {errorLogs.map(log => (
-                                <tr key={log.log_id}>
-                                    <td>{new Date(log.created_at).toLocaleString()}</td>
-                                    <td>
-                                        <span className="error-type" style={{
-                                            color: log.error_type === 'ERROR' ? '#ef4444' : '#f5a623',
-                                            backgroundColor: log.error_type === 'ERROR' ? '#fee2e2' : '#fef3c7',
-                                        }}>{log.error_type}</span>
-                                    </td>
-                                    <td>{log.error_message}</td>
+                                <tr key={log.log_id} onClick={() => { window.location.href = `/error/${log.log_id}` }} style={{cursor: 'pointer'}}>
+                                        <td>{new Date(log.created_at).toLocaleString()}</td>
+                                        <td>
+                                            <span className="error-type" style={{
+                                                color: log.error_type === 'ERROR' ? '#ef4444' : '#f5a623',
+                                                backgroundColor: log.error_type === 'ERROR' ? '#fee2e2' : '#fef3c7',
+                                            }}>{log.error_type}</span>
+                                        </td>
+                                        <td>{log.error_message}</td>
                                 </tr>
                             ))}
                         </tbody>
