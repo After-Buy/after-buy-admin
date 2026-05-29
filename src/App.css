@@ -777,6 +777,11 @@ a {
   filter: brightness(0.9);
 }
 
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
 .ocr-pie-chart {
   text-align: center; 
   margin-top: 50px; 
