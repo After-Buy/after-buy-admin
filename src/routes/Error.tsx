@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 type ErrorLog = {
     log_id: number;
+    service_name: string;
     error_type: string;
     error_message: string;
     full_message: string;
@@ -85,6 +86,7 @@ function ErrorLogs() {
                             <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                                 <tr>
                                     <th style={{ padding: '16px', textAlign: 'center' }}>ID</th>
+                                    <th style={{ padding: '16px', textAlign: 'center' }}>서비스 이름</th>
                                     <th style={{ padding: '16px' }}>발생 일시</th>
                                     <th style={{ padding: '16px', textAlign: 'center' }}>유형</th>
                                     <th style={{ padding: '16px', width: '35%' }}>에러 메시지</th>
@@ -101,6 +103,7 @@ function ErrorLogs() {
                                 {errorLogs.map(log => (
                                     <tr key={log.log_id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }} onClick={() => navigate(`/error/${log.log_id}`, { state: { log } })}>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>{log.log_id}</td>
+                                        <td style={{ padding: '16px', textAlign: 'center' }}>{log.service_name}</td>
                                         <td style={{ padding: '16px' }}>{new Date(log.created_at).toLocaleString()}</td>
                                         <td style={{ padding: '16px', textAlign: 'center' }}>
                                             <span style={{
